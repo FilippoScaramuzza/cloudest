@@ -61,7 +61,7 @@ class App extends Component {
 
   getAmountAvailable = async () => {
     const { web3, contract, accounts } = this.state;
-
+     
     let amountAvailable = await contract.methods.getAmountAvailable().call();
 
     let balance = await web3.eth.getBalance(accounts[0]);
