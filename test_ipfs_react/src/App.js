@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import Axios from 'axios';
 import ipfsClient from 'ipfs-http-client';
+import fileDownload from 'js-file-download';
 
 class App extends Component {
   state = {
@@ -7,17 +9,19 @@ class App extends Component {
     file: null,
     buffer: null,
     fileHash: null,
-    fileContent: null
+    fileContent: null,
+    buttonType: "ui teal right labeled icon button",
+    percentCompleted: 0,
   }
 
   componentDidMount = async () => {
     const ipfs = new ipfsClient({ host: "ipfs.infura.io", port: "5001", protocol: "https" });
-    this.setState({ipfs});
+    this.setState({ ipfs });
   }
 
   changeHandler = (event) => {
     const file = event.target.files[0];
-    this.setState({file});
+    this.setState({ file });
   };
 
   uploadFile = () => {
@@ -38,38 +42,68 @@ class App extends Component {
   };
 
   addFile = async () => {
-    const { ipfs, buffer } = this.state; 
+    const { ipfs, buffer } = this.state;
+
+    this.setState({ buttonType: "ui teal right labeled loading disabled icon button" });
     const fileAdded = await ipfs.add({ content: buffer });
+    this.setState({ buttonType: "ui teal right labeled icon button" });
+    fileAdded.onloadend = () => console.log("pirlone");
     const fileHash = fileAdded.cid;
-    this.setState({fileHash: fileHash.string});
+    this.setState({ fileHash: fileHash.string });
   }
 
   retrieveFile = async () => {
     const { ipfs, fileHash } = this.state;
     const bytes = [];
-      for await (const chunk of ipfs.cat(fileHash)) {
-        bytes.push(Buffer.from(chunk));
+    for await (const chunk of ipfs.cat(fileHash)) {
+      bytes.push(Buffer.from(chunk));
+    }
+    const fileContent = (Buffer.concat(bytes).toString());
+    this.setState({ fileContent });
+
+    /*await Axios.get('https://ipfs.io/ipfs/' + fileHash, {
+      responseType: 'blob',
+      onDownloadProgress: (progressEvent) => {
+        console.log("pirla coglione degficiente");
+        let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100)
+        console.log(percentCompleted);
+        //this.setState({percentCompleted});
       }
-      const fileContent = (Buffer.concat(bytes).toString());
-      this.setState({fileContent});
-      this.showContentFile();
-     }
-    
-     showContentFile = () => {
-   const {fileContent} = this.state;
-   console.log(fileContent)
-   if(fileContent != null){
-     return (
-       <div class="ui center aligned info message"> <label>{fileContent}</label></div>
-     );
-   }
-   return;
+    }).then(res => {
+      fileDownload(res.data, "prova.pdf");
+    });
+    //fileDownload(fileContent, "prova.pdf", "application/pdf");*/
+
+    Axios({
+      url: 'https://ipfs.io/ipfs/' + fileHash,
+      method: "GET",
+      responseType: "blob", // important
+      onDownloadProgress: (progressEvent) => {
+        let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total); // you can use this to show user percentage of file downloaded
+        console.log(percentCompleted);
+        this.setState({ percentCompleted });
+      }
+    }).then(res => {
+      fileDownload(res.data, "prova.zip");
+    });
+
+    //this.showContentFile();
   }
-  
+
+  showContentFile = () => {
+    const { fileContent } = this.state;
+    if (fileContent != null) {
+      return (
+        <div className="ui center aligned info message"> <label>{fileContent}</label></div>
+      );
+    }
+    return;
+  }
+
 
   getLink = () => {
-    const {fileHash} = this.state;
-    if(fileHash != null){
+    const { fileHash } = this.state;
+    if (fileHash != null) {
       let link = "https://ipfs.io/ipfs/" + fileHash;
       return (
         <a href={link} download="prova.txt">{link}</a>
@@ -79,7 +113,7 @@ class App extends Component {
   }
 
   render() {
-    
+
     let colors = ["red", "yellow", "orange", "olive", "green", "teal", "blue", "violet", "purple", "pink", "brown", "grey"];
     let randIcon = colors[Math.floor(Math.random() * colors.length)] + " world icon";
     let randButton = "ui teal right labeled icon button";
@@ -95,24 +129,32 @@ class App extends Component {
 
         <div className="ui action input" style={{ margin: "20px" }}>
           <input type="file" name="fileToUpload" onChange={this.changeHandler} />
-          <button className="ui teal right labeled icon button" onClick={this.uploadFile}>
+          <button className={this.state.buttonType} onClick={this.uploadFile}>
             <i className="file icon"></i>
             Upload File
         </button>
-        </div><br/>
+        </div><br />
 
         {this.getLink()}
 
-        <br/><br/>
+        <br /><br />
         <div className="ui action input" style={{ margin: "20px" }}>
-          
+
           <button className={randButton} onClick={this.retrieveFile}>
             <i className="eye icon"></i>
               File content
           </button>
         </div><br />
 
-        {this.showContentFile()}        
+        <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
+          <div className="bar" style={{ width: this.state.percentCompleted + "%" }}></div>
+          <div className="label">Downloading Files</div>
+        </div>
+
+        <br />
+
+
+        {/*this.showContentFile()*/}
 
       </div>
     );
