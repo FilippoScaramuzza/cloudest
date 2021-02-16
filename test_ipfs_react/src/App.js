@@ -26,10 +26,10 @@ class App extends Component {
 
   uploadFile = () => {
     const { file } = this.state;
+    if(file == null) return; // avoid users to click "upload" without selecting a file
     let reader = new window.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => this.convertToBuffer(reader);
-
   }
 
   convertToBuffer = async (reader) => {
@@ -53,6 +53,7 @@ class App extends Component {
 
   retrieveFile = async () => {
     const { fileHash, file } = this.state;
+    if(fileHash == null) return; // avoid users trying to "download" files not uploaded
     this.setState({ downloadLoading: true });
     let downloadLoading = true;
 
