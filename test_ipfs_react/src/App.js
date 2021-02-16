@@ -9,7 +9,6 @@ class App extends Component {
     file: null,
     buffer: null,
     fileHash: null,
-    fileContent: null,
     uploadLoding: false,
     downloadLoading: false,
     percentCompleted: 0
@@ -53,45 +52,36 @@ class App extends Component {
   }
 
   retrieveFile = async () => {
-    const { fileHash, file} = this.state;
+    const { fileHash, file } = this.state;
     this.setState({ downloadLoading: true });
+    let downloadLoading = true;
 
-    /*await Axios.get('https://ipfs.io/ipfs/' + fileHash, {
-      responseType: 'blob',
-      onDownloadProgress: (progressEvent) => {
-        console.log("pirla coglione degficiente");
-        let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100)
-        console.log(percentCompleted);
-        //this.setState({percentCompleted});
-      }
-    }).then(res => {
-      fileDownload(res.data, "prova.pdf");
-    });
-    //fileDownload(fileContent, "prova.pdf", "application/pdf");*/
-
-    Axios({
+    await Axios({
       url: 'https://ipfs.io/ipfs/' + fileHash,
       method: "GET",
       responseType: "blob", // important
       onDownloadProgress: (progressEvent) => {
-        let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100); // you can use this to show user percentage of file downloaded
+        let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100);
         console.log(percentCompleted);
         //console.log(percentCompleted);
-        this.setState({ percentCompleted });
+        if(percentCompleted === 100) {
+          console.log("AAAAAAAA");
+          if(downloadLoading)
+            this.setState({
+              file: null,
+              buffer: null,
+              fileHash: null,
+              uploadLoding: false,
+              downloadLoading: false,
+              percentCompleted: 0
+            })
+        }
+        else
+          this.setState({ percentCompleted, downloadLoading });
       }
     }).then(res => {
       fileDownload(res.data, file.name);
     });
-  }
-
-  showContentFile = () => {
-    const { fileContent } = this.state;
-    if (fileContent != null) {
-      return (
-        <div className="ui center aligned info message"> <label>{fileContent}</label></div>
-      );
-    }
-    return;
   }
 
   getLink = () => {
@@ -108,12 +98,7 @@ class App extends Component {
 
   renderProgressBar = () => {
 
-    const {percentCompleted, downloadLoading} = this.state;
-
-    if(percentCompleted === 100) {
-      if(downloadLoading)
-        this.setState({downloadLoading: false});
-    }
+    const {percentCompleted} = this.state;
 
     return (
     <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
@@ -160,10 +145,6 @@ class App extends Component {
         {this.state.percentCompleted !== 0 ? this.renderProgressBar() : ""}
 
         <br />
-
-
-        {/*this.showContentFile()*/}
-
       </div>
     );
   }
