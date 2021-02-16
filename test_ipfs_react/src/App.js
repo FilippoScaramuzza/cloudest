@@ -10,8 +10,9 @@ class App extends Component {
     buffer: null,
     fileHash: null,
     fileContent: null,
-    buttonType: "ui teal right labeled icon button",
-    percentCompleted: 0,
+    uploadLoding: false,
+    downloadLoading: false,
+    percentCompleted: 0
   }
 
   componentDidMount = async () => {
@@ -44,22 +45,16 @@ class App extends Component {
   addFile = async () => {
     const { ipfs, buffer } = this.state;
 
-    this.setState({ buttonType: "ui teal right labeled loading disabled icon button" });
+    this.setState({ uploadLoading: true});
     const fileAdded = await ipfs.add({ content: buffer });
-    this.setState({ buttonType: "ui teal right labeled icon button" });
-    fileAdded.onloadend = () => console.log("pirlone");
+    this.setState({ uploadLoading: false });
     const fileHash = fileAdded.cid;
     this.setState({ fileHash: fileHash.string });
   }
 
   retrieveFile = async () => {
-    const { ipfs, fileHash } = this.state;
-    const bytes = [];
-    for await (const chunk of ipfs.cat(fileHash)) {
-      bytes.push(Buffer.from(chunk));
-    }
-    const fileContent = (Buffer.concat(bytes).toString());
-    this.setState({ fileContent });
+    const { fileHash, file} = this.state;
+    this.setState({ downloadLoading: true });
 
     /*await Axios.get('https://ipfs.io/ipfs/' + fileHash, {
       responseType: 'blob',
@@ -79,15 +74,14 @@ class App extends Component {
       method: "GET",
       responseType: "blob", // important
       onDownloadProgress: (progressEvent) => {
-        let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total); // you can use this to show user percentage of file downloaded
+        let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100); // you can use this to show user percentage of file downloaded
         console.log(percentCompleted);
+        //console.log(percentCompleted);
         this.setState({ percentCompleted });
       }
     }).then(res => {
-      fileDownload(res.data, "prova.zip");
+      fileDownload(res.data, file.name);
     });
-
-    //this.showContentFile();
   }
 
   showContentFile = () => {
@@ -100,23 +94,38 @@ class App extends Component {
     return;
   }
 
-
   getLink = () => {
-    const { fileHash } = this.state;
+    const { fileHash,file } = this.state;
     if (fileHash != null) {
       let link = "https://ipfs.io/ipfs/" + fileHash;
       return (
-        <a href={link} download="prova.txt">{link}</a>
+
+        <a href={link} download={file.name}>{link}</a>
       );
     }
     return;
+  }
+
+  renderProgressBar = () => {
+
+    const {percentCompleted, downloadLoading} = this.state;
+
+    if(percentCompleted === 100) {
+      if(downloadLoading)
+        this.setState({downloadLoading: false});
+    }
+
+    return (
+    <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
+      <div className="bar" style={{ width: percentCompleted + "%" }}></div>
+      <div className="label">Downloading Files</div>
+    </div>);
   }
 
   render() {
 
     let colors = ["red", "yellow", "orange", "olive", "green", "teal", "blue", "violet", "purple", "pink", "brown", "grey"];
     let randIcon = colors[Math.floor(Math.random() * colors.length)] + " world icon";
-    let randButton = "ui teal right labeled icon button";
 
     return (
       <div className="App padded" style={{ margin: "20px", textAlign: "center" }}>
@@ -129,8 +138,10 @@ class App extends Component {
 
         <div className="ui action input" style={{ margin: "20px" }}>
           <input type="file" name="fileToUpload" onChange={this.changeHandler} />
-          <button className={this.state.buttonType} onClick={this.uploadFile}>
-            <i className="file icon"></i>
+          <button className={
+            this.state.uploadLoading===true ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
+          } onClick={this.uploadFile}>
+            <i className="upload icon"></i>
             Upload File
         </button>
         </div><br />
@@ -138,18 +149,15 @@ class App extends Component {
         {this.getLink()}
 
         <br /><br />
-        <div className="ui action input" style={{ margin: "20px" }}>
-
-          <button className={randButton} onClick={this.retrieveFile}>
-            <i className="eye icon"></i>
-              File content
+          <button className={
+            this.state.downloadLoading ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
+          } onClick={this.retrieveFile}>
+            <i className="download icon"></i>
+              Download
           </button>
-        </div><br />
+        <br /><br/>
 
-        <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
-          <div className="bar" style={{ width: this.state.percentCompleted + "%" }}></div>
-          <div className="label">Downloading Files</div>
-        </div>
+        {this.state.percentCompleted !== 0 ? this.renderProgressBar() : ""}
 
         <br />
 
