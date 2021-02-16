@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Axios from 'axios';
 import ipfsClient from 'ipfs-http-client';
 import fileDownload from 'js-file-download';
+import crypto from 'crypto';
 
 class App extends Component {
   state = {
@@ -11,7 +12,7 @@ class App extends Component {
     fileHash: null,
     uploadLoding: false,
     downloadLoading: false,
-    percentCompleted: 0
+    percentCompleted: 0,
   }
 
   componentDidMount = async () => {
@@ -26,17 +27,46 @@ class App extends Component {
 
   uploadFile = () => {
     const { file } = this.state;
-    if(file == null) return; // avoid users to click "upload" without selecting a file
+    if (file == null) return; // avoid users to click "upload" without selecting a file
     let reader = new window.FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => this.convertToBuffer(reader);
+  }
+
+  encrypt = (buffer) => {
+    const {accounts} = this.state;
+
+    let cipher, result, iv;
+    // Create an iv
+    iv = crypto.randomBytes(16);
+    // Create a new cipher
+    cipher = crypto.createCipheriv('aes-256-ctr', 'bncaskdbvasbvlaslslasfhjaaaaaaaa', iv);
+    // Create the new chunk
+    result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
+
+    return result;
+  }
+
+  decrypt = (buffer) => {
+    var decipher, result, iv;
+    // Get the iv: the first 16 bytes
+    iv = buffer.slice(0, 16);
+    // Get the rest
+    buffer = buffer.slice(16);
+    // Create a decipher
+    decipher = crypto.createDecipheriv('aes-256-ctr', 'bncaskdbvasbvlaslslasfhjaaaaaaaa', iv);
+    // Actually decrypt it
+    result = Buffer.concat([decipher.update(buffer), decipher.final()]);
+
+    return result;
   }
 
   convertToBuffer = async (reader) => {
     //file is converted to a buffer to prepare for uploading to IPFS
     const buffer = await Buffer.from(reader.result);
     //set this buffer -using es6 syntax
-    this.setState({ buffer });
+
+    this.setState({ buffer: this.encrypt(buffer) });
 
     this.addFile();
   };
@@ -44,7 +74,7 @@ class App extends Component {
   addFile = async () => {
     const { ipfs, buffer } = this.state;
 
-    this.setState({ uploadLoading: true});
+    this.setState({ uploadLoading: true });
     const fileAdded = await ipfs.add({ content: buffer });
     this.setState({ uploadLoading: false });
     const fileHash = fileAdded.cid;
@@ -53,40 +83,35 @@ class App extends Component {
 
   retrieveFile = async () => {
     const { fileHash, file } = this.state;
-    if(fileHash == null) return; // avoid users trying to "download" files not uploaded
+    if (fileHash == null) return; // avoid users trying to "download" files not uploaded
     this.setState({ downloadLoading: true });
     let downloadLoading = true;
 
     await Axios({
       url: 'https://ipfs.io/ipfs/' + fileHash,
       method: "GET",
-      responseType: "blob", // important
+      responseType: "arraybuffer", // important
       onDownloadProgress: (progressEvent) => {
         let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-        console.log(percentCompleted);
-        //console.log(percentCompleted);
-        if(percentCompleted === 100) {
-          console.log("AAAAAAAA");
-          if(downloadLoading)
-            this.setState({
-              file: null,
-              buffer: null,
-              fileHash: null,
-              uploadLoding: false,
-              downloadLoading: false,
-              percentCompleted: 0
-            })
-        }
-        else
-          this.setState({ percentCompleted, downloadLoading });
+        this.setState({ percentCompleted, downloadLoading });
       }
     }).then(res => {
-      fileDownload(res.data, file.name);
+      if (downloadLoading) {
+        this.setState({
+          file: null,
+          buffer: null,
+          fileHash: null,
+          uploadLoding: false,
+          downloadLoading: false,
+          percentCompleted: 0
+        })
+      }
+      fileDownload(this.decrypt(Buffer.from(res.data)), file.name);
     });
   }
 
   getLink = () => {
-    const { fileHash,file } = this.state;
+    const { fileHash, file } = this.state;
     if (fileHash != null) {
       let link = "https://ipfs.io/ipfs/" + fileHash;
       return (
@@ -99,13 +124,13 @@ class App extends Component {
 
   renderProgressBar = () => {
 
-    const {percentCompleted} = this.state;
+    const { percentCompleted } = this.state;
 
     return (
-    <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
-      <div className="bar" style={{ width: percentCompleted + "%" }}></div>
-      <div className="label">Downloading Files</div>
-    </div>);
+      <div className="ui teal progress" style={{ width: "30%", margin: "auto" }}>
+        <div className="bar" style={{ width: percentCompleted + "%" }}></div>
+        <div className="label">Downloading Files</div>
+      </div>);
   }
 
   render() {
@@ -125,7 +150,7 @@ class App extends Component {
         <div className="ui action input" style={{ margin: "20px" }}>
           <input type="file" name="fileToUpload" onChange={this.changeHandler} />
           <button className={
-            this.state.uploadLoading===true ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
+            this.state.uploadLoading === true ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
           } onClick={this.uploadFile}>
             <i className="upload icon"></i>
             Upload File
@@ -135,13 +160,13 @@ class App extends Component {
         {this.getLink()}
 
         <br /><br />
-          <button className={
-            this.state.downloadLoading ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
-          } onClick={this.retrieveFile}>
-            <i className="download icon"></i>
+        <button className={
+          this.state.downloadLoading ? "ui teal right labeled loading disabled icon button" : "ui teal right labeled icon button"
+        } onClick={this.retrieveFile}>
+          <i className="download icon"></i>
               Download
           </button>
-        <br /><br/>
+        <br /><br />
 
         {this.state.percentCompleted !== 0 ? this.renderProgressBar() : ""}
 
