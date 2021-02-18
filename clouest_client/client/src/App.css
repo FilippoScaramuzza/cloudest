@@ -1,6 +1,5 @@
 .App {
   text-align: center;
-  background-color: #33353E;
 }
 
 .App-logo {
@@ -30,7 +29,8 @@
   width: 20%;
   height: 100vh;
   float: left;
-  box-shadow: 10px 15px 15px 10px #222;
+  box-shadow: 10px 0px 20px 0px #999;
+  background-color: #33353E;
 }
 
 .mainpage {
