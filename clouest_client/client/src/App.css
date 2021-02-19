@@ -33,11 +33,12 @@
   background-color: #33353E;
 }
 
-.mainpage {
-  margin-left: 30%;
-}
-
 .main-logo-img {
   width: 60%;
   margin: auto;
+}
+
+.mainpage {
+  margin: 30px auto;
+  width: 60%;
 }

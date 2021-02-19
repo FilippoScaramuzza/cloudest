@@ -18,26 +18,35 @@ class App extends Component {
           
           <br/><br />
           <button className="ui teal right labeled icon button" style={{borderRadius: "50px"}}>
-            <i class="add icon"></i>
+            <i className="add icon"></i>
             Add File
           </button>
           
           <br/><br/><br/>
           <button className="ui teal right labeled icon button" style={{width: "60%"}}>
-            <i class="clock outline icon"></i>
+            <i className="folder icon"></i>
+            Files and Folders
+          </button>
+
+          <br/><br/>
+          <button className="ui teal right labeled icon button" style={{width: "60%"}}>
+            <i className="clock outline icon"></i>
             Recent files
           </button>
 
           <br/><br/>
           <button className="ui teal right labeled icon button" style={{width: "60%"}}>
-            <i class="star icon"></i>
+            <i className="star icon"></i>
             Preferred files
           </button>
           
 
         </div>
         <div className="mainpage">
-          <h1>My Files</h1>
+          <h1 className="ui horizontal divider header">
+            <i className="teal folder icon"></i>
+            Files and Folders
+          </h1>
         </div>
       </div>
     );
