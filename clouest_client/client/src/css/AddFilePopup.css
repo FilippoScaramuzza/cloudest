@@ -29,3 +29,40 @@
   padding: 20px;
   width: 500px;
 }
+
+.inputDnD .form-control-file {
+  width: 100%;
+  height: 100%;
+  min-height: 6em;
+  outline: none;
+  visibility: hidden;
+  cursor: pointer;
+  background-color: #c61c23;
+  box-shadow: 0 0 5px solid #008080;
+}
+.inputDnD .form-control-file:before {
+  content: attr(data-title);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  min-height: 6em;
+  line-height: 2em;
+  padding-top: 1.5em;
+  opacity: 1;
+  visibility: visible;
+  text-align: center;
+  border: 0.25em dashed #008080;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: visible;
+}
+.inputDnD .form-control-file:hover:before {
+  border-style: #008080 solid;
+  box-shadow: inset 0px 0px 0px 0.25em #008080;
+}
+
+.inputDnD .form-control-file:hover {
+  border-style: #008080 solid;
+  box-shadow: inset 0px 0px 0px 0.25em #008080;
+}
+
+
