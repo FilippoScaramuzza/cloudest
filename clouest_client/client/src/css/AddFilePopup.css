@@ -47,20 +47,17 @@
   width: 100%;
   min-height: 6em;
   line-height: 2em;
-  padding-top: 1.5em;
+  padding-top: 1.7em;
   opacity: 1;
   visibility: visible;
   text-align: center;
   border: 0.25em dashed #008080;
+  border-radius: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: visible;
 }
-.inputDnD .form-control-file:hover:before {
-  border-style: #008080 solid;
-  box-shadow: inset 0px 0px 0px 0.25em #008080;
-}
 
-.inputDnD .form-control-file:hover {
+.inputDnD .form-control-file:hover:before {
   border-style: #008080 solid;
   box-shadow: inset 0px 0px 0px 0.25em #008080;
 }

@@ -23,7 +23,6 @@ class App extends Component {
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
-
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
@@ -57,9 +56,9 @@ class App extends Component {
   }
 
   render() {
-    const { currentPage } = this.state;
+    const { currentPage, web3 } = this.state;
 
-    if (!this.state.web3) {
+    if (!web3) {
       return (
         <div className="App">
           <div className="ui info message" style={{ margin: "40px auto" }}>
@@ -81,10 +80,10 @@ class App extends Component {
           <img className="main-logo-img" alt="Cloudest" src={logo} />
 
           <br /><br />
-          <AddFilePopup />
+          <AddFilePopup web3={web3}/>
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
-                  style={{ width: "60%" }}
+                  style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("files")}>
                   <i className="folder icon"></i>
             Files and Folders
@@ -92,7 +91,7 @@ class App extends Component {
 
                 <br /><br />
                 <button className="ui teal right labeled icon button"
-                  style={{ width: "60%" }}
+                  style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("recent")}>
                   <i className="clock outline icon"></i>
             Recent files
@@ -100,7 +99,7 @@ class App extends Component {
 
                 <br /><br />
                 <button className="ui teal right labeled icon button"
-                  style={{ width: "60%" }}
+                  style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("preferred")}>
                   <i className="star icon"></i>
             Preferred files

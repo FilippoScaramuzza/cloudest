@@ -14,34 +14,33 @@ contract FileDetailsManager {
     struct FileDetails {
         string fileHash; // The IPFS file hash
         string fileName; // The file name
-        uint256 transactionDate; // The date in which file infos was stored
+        string transactionDate; // The date in which file infos was stored
         string fileExtension; // The type of file (its extension)
     }
 
     /*
      * Mapping file details with users account address
     */
-    mapping(address => FileDetails[]) filesList;
+    mapping(address => FileDetails) filesList;
 
     /* 
      * When calling this function, the file's information are mapped to address 
      * of the user.
     */
-    function addFile(string memory fileHash, string memory fileName, string memory fileType, uint256 date) public {
-        filesList[msg.sender].push(
-            FileDetails({
+    function addFile(string memory fileHash, string memory fileName, string memory fileType, string memory date) public {
+        filesList[msg.sender] = FileDetails({
                 fileHash: fileHash,
                 fileName: fileName,
                 fileExtension: fileType,
                 transactionDate: date
-            })
-        );
+            });
     }
 
     /* 
      * TODO: description of returned values
     */
-    function getFiles(uint256 position) public view returns (string memory, string memory, string memory, uint256) {
+    /*
+    function getFiles(uint256 position) public view returns (string memory, string memory, string memory, string memory) {
         FileDetails memory fileToBeRetrieved = filesList[msg.sender][position];
         return (
             fileToBeRetrieved.fileHash,
@@ -49,5 +48,5 @@ contract FileDetailsManager {
             fileToBeRetrieved.fileExtension,
             fileToBeRetrieved.transactionDate
         );
-    }
+    }*/
 }
