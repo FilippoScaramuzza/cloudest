@@ -18,8 +18,10 @@ class AddFilePopup extends Component {
   uploadFile = async (e) => {
     e.preventDefault();
     const { file, web3 } = this.state;
-    const pippo = new ContractsManager(web3);
-    pippo.loadDetailsToChain("hash1234", file);
+    const contractsManager = new ContractsManager(web3);
+    contractsManager.init( () => {
+      contractsManager.loadDetailsToChain("hash1234", file);
+    });
   }
 
   render() {

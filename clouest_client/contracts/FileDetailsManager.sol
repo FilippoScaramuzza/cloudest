@@ -1,4 +1,5 @@
 pragma solidity >=0.4.21 <0.7.0;
+pragma experimental ABIEncoderV2;
 
 /*
  * Contract for storing and retrieve file details uploaded to the IPFS
@@ -21,32 +22,27 @@ contract FileDetailsManager {
     /*
      * Mapping file details with users account address
     */
-    mapping(address => FileDetails) filesList;
+    mapping(address => FileDetails[]) filesList;
 
     /* 
      * When calling this function, the file's information are mapped to address 
      * of the user.
     */
     function addFile(string memory fileHash, string memory fileName, string memory fileType, string memory date) public {
-        filesList[msg.sender] = FileDetails({
+        filesList[msg.sender].push(FileDetails({
                 fileHash: fileHash,
                 fileName: fileName,
                 fileExtension: fileType,
                 transactionDate: date
-            });
+            }));
     }
 
     /* 
      * TODO: description of returned values
     */
-    /*
-    function getFiles(uint256 position) public view returns (string memory, string memory, string memory, string memory) {
-        FileDetails memory fileToBeRetrieved = filesList[msg.sender][position];
-        return (
-            fileToBeRetrieved.fileHash,
-            fileToBeRetrieved.fileName,
-            fileToBeRetrieved.fileExtension,
-            fileToBeRetrieved.transactionDate
-        );
-    }*/
+    
+    function getFiles() public view returns (FileDetails[] memory) {
+        FileDetails[] memory fileToBeRetrieved = filesList[msg.sender];
+        return (fileToBeRetrieved);
+    }
 }

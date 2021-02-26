@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import 'reactjs-popup/dist/index.css';
 
 //import FileDetailsManager from "./contracts/FileDetailsManager.json";
 import getWeb3 from "./getWeb3";
+import AddFilePopup from "./AddFilePopup";
+import FileViewer from "./FileViewer";
 
 import logo from './img/logo.svg';
+import 'reactjs-popup/dist/index.css';
 import 'semantic-ui-css/semantic.min.css'
-
 import "./css/App.css";
-import AddFilePopup from "./AddFilePopup";
 
 class App extends Component {
 
@@ -25,18 +25,6 @@ class App extends Component {
       const web3 = await getWeb3();
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      //const networkId = await web3.eth.net.getId();
-      /*
-      const deployedNetwork = Faucet.networks[networkId];
-      const instance = new web3.eth.Contract(
-        Faucet.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      */
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
 
       //this.setState({ web3, accounts, contract: instance });
       this.setState({ web3, accounts });
@@ -105,15 +93,16 @@ class App extends Component {
             Preferred files
           </button>
 
-
         </div>
-              <div className="mainpage">
-                <h1 className="ui horizontal divider header">
-                  <i className="teal folder icon"></i>
-                  {currentPage}
-                </h1>
-              </div>
-            </div>
+        <div className="mainpage">
+          <h1 className="ui horizontal divider header">
+            <i className="teal folder icon"></i>
+            {currentPage}
+          </h1>
+
+          <FileViewer web3={web3}/>
+        </div>
+      </div>
     );
   }
 }

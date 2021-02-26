@@ -10,7 +10,7 @@ class ContractsManager extends Component{
 		this.contract = null;
 	}
 
-	init =  async () => {
+	init =  async (callback) => {
 
 		const { web3 } = this;
 		// Use web3 to get the user's accounts.
@@ -29,21 +29,18 @@ class ContractsManager extends Component{
 		this.web3 = web3;
 		this.accounts = accounts;
 		this.contract = instance;
+
+		callback.bind(this)();
 	}
 
 	loadDetailsToChain = async (ipfsFileHash, file) => {
-		const { web3 } = this;
-
-		console.log("culo1");
-		await this.init(web3);
-
-		console.log("culo2");
+		
 		const { accounts, contract } = this;
 
-		var date = new Date();
-		var dd = String(date.getDate()).padStart(2, '0');
-		var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-		var yyyy = date.getFullYear();
+		let date = new Date();
+		let dd = String(date.getDate()).padStart(2, '0');
+		let mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+		let yyyy = date.getFullYear();
 
 		date = mm + '/' + dd + '/' + yyyy;
 		console.log(accounts);
@@ -52,7 +49,19 @@ class ContractsManager extends Component{
 		} catch (error) {
 			console.log(error);
 		}
-        console.log("culone");
+        console.log(await contract.methods.getFiles().call({ from: accounts[0] }));
+	}
+	
+	getFilesDetails = async () => {
+		const { accounts, contract } = this;
+		let filesDetails = null;
+		try {
+			filesDetails = await contract.methods.getFiles().call({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+
+		return filesDetails;
 	}
 }
 
