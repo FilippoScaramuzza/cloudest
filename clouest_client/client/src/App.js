@@ -82,15 +82,15 @@ class App extends Component {
                   style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("recent")}>
                   <i className="clock outline icon"></i>
-            Recent files
+            Recent Files
           </button>
 
                 <br /><br />
                 <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}
-                  onClick={() => this.changeCurrentPage("preferred")}>
+                  onClick={() => this.changeCurrentPage("favorite")}>
                   <i className="star icon"></i>
-            Preferred files
+            Favorite Files
           </button>
 
         </div>

@@ -25,9 +25,9 @@
   border: 1px solid #cfcece;
 }
 .popup-content {
-  border-radius: 10px;
-  padding: 20px;
-  width: 500px;
+  border-radius: 10px!important;
+  padding: 20px!important;
+  width: 500px!important;
 }
 
 .inputDnD .form-control-file {

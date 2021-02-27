@@ -6,7 +6,8 @@ import "./css/AddFilePopup.css";
 class AddFilePopup extends Component {
   state = {
     file: null,
-    web3: this.props["web3"]
+    web3: this.props["web3"],
+    loading: false
   }
 
   fileInputOnChangeHandler = (e) => {
@@ -19,8 +20,11 @@ class AddFilePopup extends Component {
     e.preventDefault();
     const { file, web3 } = this.state;
     const contractsManager = new ContractsManager(web3);
-    contractsManager.init( () => {
-      contractsManager.loadDetailsToChain("hash1234", file);
+    this.setState({loading: true});
+    contractsManager.init( async () => {
+      await contractsManager.loadDetailsToChain("hash1234", file);
+      this.setState({loading: false});
+      window.location.reload();
     });
   }
 
@@ -36,7 +40,7 @@ class AddFilePopup extends Component {
             <i className="teal file icon"></i>
             Add File
           </h3>
-          <form className="ui form">
+          <form className={this.state.loading ? "ui loading form" : "ui form"}>
             <div className="form-group inputDnD">
               <input type="file" className="form-control-file text-danger font-weight-bold" id="inputFile" data-title="Click here to select a file or Drag and Drop it."
               onChange={this.fileInputOnChangeHandler} />
