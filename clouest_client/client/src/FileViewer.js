@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ContractsManager from './tools/ContractsManager';
 import { Dropdown } from 'semantic-ui-react';
+import IpfsManager from './tools/IpfsManager';
 
 class FileViewer extends Component {
 	state = {
@@ -34,6 +35,15 @@ class FileViewer extends Component {
 		}
 	}
 
+	downloadFile = (file) => {
+		const ipfsManager = new IpfsManager();
+    	ipfsManager.init( async () => {
+      		await ipfsManager.retrieveFile(file);
+      		//console.log(file.fileHash);
+      
+      });
+	}
+
 	renderFilesDetails = () => {
 		const { filesDetails } = this.state;
 		if (filesDetails == null) return null;
@@ -51,7 +61,7 @@ class FileViewer extends Component {
 						</div>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
-								<Dropdown.Item icon='download' text='Download' />
+								<Dropdown.Item icon='download' text='Download' onClick={this.downloadFile(fd)}/>
 								<Dropdown.Item icon='i cursor' text='Rename' />
 								<Dropdown.Item icon='yellow outline star' text='Add to Favorite' />
 								<Dropdown.Divider />
