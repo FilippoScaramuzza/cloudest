@@ -63,9 +63,21 @@ class ContractsManager extends Component{
 
 		return filesDetails;
 	}
+
+	renameFileName = async (fileHash, fileName, newName) => {
+		const { accounts, contract } = this;
+
+		console.log(fileHash);
+		console.log(fileName);
+		console.log(newName);
+		try {
+			await contract.methods.renameFileName(fileHash, fileName, newName).call({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+	}
 }
 
-//const contractsManager = new ContractsManager();
 export default ContractsManager;
 
 

@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import ContractsManager from './tools/ContractsManager';
 import { Dropdown } from 'semantic-ui-react';
 import IpfsManager from './tools/IpfsManager';
+import RenameFilePopup from './RenameFilePopup';
 
 class FileViewer extends Component {
 	state = {
 		web3: this.props.web3,
-		filesDetails: null
+		filesDetails: null,
+		fileDownloading: null
 	}
 
 	componentDidMount = async () => {
@@ -15,6 +17,10 @@ class FileViewer extends Component {
 		const contractsManager = new ContractsManager(web3);
 		contractsManager.init(async () => {
 			await contractsManager.getFilesDetails().then((res) => {
+				res.forEach(fd => {
+					fd["downloading"] = false;
+				});
+				console.log(res);
 				this.setState({ filesDetails: res });
 			});
 		});
@@ -34,42 +40,57 @@ class FileViewer extends Component {
 				return "teal file outline icon";
 		}
 	}
-
+	
 	downloadFile = (file) => {
+		let { filesDetails } = this.state;
 		const ipfsManager = new IpfsManager();
-    	ipfsManager.init( async () => {
-      		await ipfsManager.retrieveFile(file);
-      		//console.log(file.fileHash);
-      
-      });
+
+		filesDetails.find(fd => fd.fileHash === file.fileHash).downloading = true;
+
+		this.setState({filesDetails});
+
+    ipfsManager.init( async () => {
+    	await ipfsManager.retrieveFile(file);
+			filesDetails.find(fd => fd.fileHash === file.fileHash).downloading = false;
+			this.setState({filesDetails});
+		  console.log(file.fileHash);
+    });
+	}
+
+	renderDownloading = () => {
+		return (
+		<div className="ui active inverted dimmer">
+			<div class="ui text loader">Downloading...</div>
+		</div>);
 	}
 
 	renderFilesDetails = () => {
 		const { filesDetails } = this.state;
 		if (filesDetails == null) return null;
 		return filesDetails.map((fd, index) => {
-			const { fileExtension, fileHash, fileName } = fd;
+			const { fileExtension, fileHash, transactionDate, fileName, downloading } = fd;
 			return (
-				<div className="ui teal card" key={index}>
-					<div className="content">
-						<i className={this.getIconFromExtension(fileExtension)} style={{fontSize: "30px"}}></i>
-					</div>
-					<div className="content">
-						<a href="localhost:3000" className="header" data-tooltip={fileName} data-position="top center">{fileName.replace(/(.{16})..+/, "$1...")}</a>
-						<div className="meta">
-							<span className="date">{fileHash}</span>
+					<div className="ui teal card" key={index}>
+						{downloading ? this.renderDownloading() : ""}
+						<div className="content">
+							<i className={this.getIconFromExtension(fileExtension)} style={{fontSize: "30px"}}></i>
 						</div>
-						<Dropdown text='Actions'>
-							<Dropdown.Menu>
-								<Dropdown.Item icon='download' text='Download' onClick={this.downloadFile(fd)}/>
-								<Dropdown.Item icon='i cursor' text='Rename' />
-								<Dropdown.Item icon='yellow outline star' text='Add to Favorite' />
-								<Dropdown.Divider />
-								<Dropdown.Item icon='red trash' text='Delete' />
-							</Dropdown.Menu>
-						</Dropdown>
+						<div className="content">
+							<span className="header" onClick={()=>{this.downloadFile(fd)}} data-tooltip={fileName} data-position="top center" style={{cursor: "pointer"}} >{fileName.replace(/(.{16})..+/, "$1...")}</span>
+							<div className="meta">
+								<span className="date">{transactionDate}</span>
+							</div>
+							<Dropdown text='Actions'>
+								<Dropdown.Menu>
+									<Dropdown.Item icon='icon download' text='Download' onClick={()=>{this.downloadFile(fd)}}/>
+									<RenameFilePopup fileHash={fileHash} fileName={fileName} web3={this.state.web3}/>
+									<Dropdown.Item icon='icon yellow outline star' text='Add to Favorite' />
+									<Dropdown.Divider />
+									<Dropdown.Item icon='icon red trash' text='Delete' />
+								</Dropdown.Menu>
+							</Dropdown>
+						</div>
 					</div>
-				</div>
 			);
 		});
 	}

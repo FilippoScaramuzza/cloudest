@@ -33,7 +33,7 @@ class AddFilePopup extends Component {
         contractsManager.init( async () => {
         await contractsManager.loadDetailsToChain(fileHash, file);
         this.setState({loading: false});
-        //window.location.reload();
+        window.location.reload();
         });
       }
       
@@ -46,8 +46,8 @@ class AddFilePopup extends Component {
       <Popup trigger={<button className="ui teal right labeled icon button"
         style={{ borderRadius: "50px" }} >
         <i className="add icon" ></i>
-                Add File
-              </button>} modal>
+          Add File
+          </button>} modal>
         <div className="modal">
           <h3 className="ui horizontal divider header">
             <i className="teal file icon"></i>

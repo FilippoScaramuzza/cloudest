@@ -52,31 +52,11 @@ class IpfsManager {
 	}*/
 	
 	retrieveFile = async (file) => {
-		//const { fileHash, file } = this.state;
-		if (file.fileHash == null) return; // avoid users trying to "download" files not uploaded
-		//this.setState({ downloadLoading: true });
-		let downloadLoading = true;
-
 		await Axios({
 			url: 'https://ipfs.io/ipfs/' + file.fileHash,
 			method: "GET",
 			responseType: "arraybuffer", // important
-			onDownloadProgress: (progressEvent) => {
-				let percentCompleted = Math.floor(progressEvent.loaded / progressEvent.total * 100);
-				//this.setState({ percentCompleted, downloadLoading });
-			}
 		}).then(res => {
-			/*if (downloadLoading) {
-				this.setState({
-					file: null,
-					buffer: null,
-					fileHash: null,
-					uploadLoding: false,
-					downloadLoading: false,
-					percentCompleted: 0
-				})
-			}*/
-			//fileDownload(this.decrypt(Buffer.from(res.data)), file.name);
 			fileDownload(Buffer.from(res.data), file.fileName);
 		});
 	}
