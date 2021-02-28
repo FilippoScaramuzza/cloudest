@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
-import ContractsManager from './tools/ContractsManager';
 import "./css/AddFilePopup.css";
+import ContractsManager from './tools/ContractsManager';
+import IpfsManager from './tools/IpfsManager';
 
 class AddFilePopup extends Component {
   state = {
@@ -19,13 +20,25 @@ class AddFilePopup extends Component {
   uploadFile = async (e) => {
     e.preventDefault();
     const { file, web3 } = this.state;
-    const contractsManager = new ContractsManager(web3);
-    this.setState({loading: true});
-    contractsManager.init( async () => {
-      await contractsManager.loadDetailsToChain("hash1234", file);
-      this.setState({loading: false});
-      window.location.reload();
+    let fileHash = null;
+    /* UPLOAD FILES TO IPFS NETWORK */
+    const ipfsManager = new IpfsManager();
+    ipfsManager.init( async () => {
+      fileHash = await ipfsManager.uploadFile(file);
+      console.log(fileHash);
+      if(fileHash != null){
+        /* UPLOAD DETAILS TO CHAIN */
+        const contractsManager = new ContractsManager(web3);
+        this.setState({loading: true});
+        contractsManager.init( async () => {
+        await contractsManager.loadDetailsToChain(fileHash, file);
+        this.setState({loading: false});
+        //window.location.reload();
+        });
+      }
+      
     });
+
   }
 
   render() {

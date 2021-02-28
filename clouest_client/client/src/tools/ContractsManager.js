@@ -49,7 +49,7 @@ class ContractsManager extends Component{
 		} catch (error) {
 			console.log(error);
 		}
-        console.log(await contract.methods.getFiles().call({ from: accounts[0] }));
+        //console.log(await contract.methods.getFiles().call({ from: accounts[0] }));
 	}
 	
 	getFilesDetails = async () => {

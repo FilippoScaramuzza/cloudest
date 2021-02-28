@@ -15,7 +15,6 @@ class FileViewer extends Component {
 		contractsManager.init(async () => {
 			await contractsManager.getFilesDetails().then((res) => {
 				this.setState({ filesDetails: res });
-				console.log(res);
 			});
 		});
 	}
@@ -40,7 +39,6 @@ class FileViewer extends Component {
 		if (filesDetails == null) return null;
 		return filesDetails.map((fd, index) => {
 			const { fileExtension, fileHash, fileName } = fd;
-			console.log(fileExtension);
 			return (
 				<div className="ui teal card" key={index}>
 					<div className="content">
