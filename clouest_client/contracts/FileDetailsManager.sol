@@ -45,4 +45,15 @@ contract FileDetailsManager {
         FileDetails[] memory fileToBeRetrieved = filesList[msg.sender];
         return (fileToBeRetrieved);
     }
+
+    /*
+    * 
+    */
+    function renameFileName(string memory fileHash, string memory fileName, string memory newName) public{
+        FileDetails[] memory fileToBeRetrieved = filesList[msg.sender];
+        for(uint i = 0; i < fileToBeRetrieved.length; i++){
+            if(keccak256(bytes(fileToBeRetrieved[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(fileToBeRetrieved[i].fileName)) == keccak256(bytes(fileName))) fileToBeRetrieved[i].fileName = newName;
+        }
+    }
+
 }
