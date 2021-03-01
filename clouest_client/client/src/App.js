@@ -3,6 +3,7 @@ import React, { Component } from "react";
 //import FileDetailsManager from "./contracts/FileDetailsManager.json";
 import getWeb3 from "./getWeb3";
 import AddFilePopup from "./AddFilePopup";
+import AddFolderPopup from "./AddFolderPopup";
 import FileViewer from "./FileViewer";
 
 import logo from './img/logo.svg';
@@ -16,7 +17,8 @@ class App extends Component {
     currentPage: "files",
     web3: null,
     accounts: null,
-    contract: null
+    contract: null,
+    currentFolder: "/"
   }
 
   componentDidMount = async () => {
@@ -43,8 +45,12 @@ class App extends Component {
     this.setState({ currentPage });
   }
 
+  updateCurrentFolder = async (currentFolder) => {
+    await this.setState({currentFolder});
+  }
+
   render() {
-    const { currentPage, web3 } = this.state;
+    const { currentPage, currentFolder, web3 } = this.state;
 
     if (!web3) {
       return (
@@ -69,11 +75,13 @@ class App extends Component {
 
           <br /><br />
           <AddFilePopup web3={web3}/>
+          <AddFolderPopup web3={web3} currentFolder={currentFolder}/>
+          {console.log(currentFolder)}
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("files")}>
-                  <i className="folder icon"></i>
+                  <i className="folder outline icon"></i>
             Files and Folders
           </button>
 
@@ -89,7 +97,7 @@ class App extends Component {
                 <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}
                   onClick={() => this.changeCurrentPage("favorites")}>
-                  <i className="star icon"></i>
+                  <i className="star outline icon"></i>
             Favorites Files
           </button>
 
@@ -99,7 +107,7 @@ class App extends Component {
             <i className="teal folder icon"></i>
             {currentPage}
           </h1>
-          <FileViewer web3={web3} currentPage={currentPage}/>
+          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} />
         </div>
       </div>
     );

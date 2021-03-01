@@ -84,6 +84,15 @@ class ContractsManager extends Component{
 		}
 	}
 
+	deleteFile = async (fileHash, fileName) => {
+		const { accounts, contract } = this;
+
+		try {
+			await contract.methods.deleteFile(fileHash, fileName).send({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+	}
 }
 
 export default ContractsManager;

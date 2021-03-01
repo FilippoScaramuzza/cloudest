@@ -9,10 +9,23 @@ class FileViewer extends Component {
 		web3: this.props.web3,
 		currentPage: this.props.currentPage,
 		filesDetails: null,
-		fileDownloading: null
+		updateCurrentFolder: this.props.updateCurrentFolder
 	}
 
 	componentDidMount = async () => {
+		this.retrieveFiles();
+		this.state.updateCurrentFolder("Cartella dei merdoni");
+	}
+
+	componentDidUpdate(prevProps) {
+		if (this.props.currentPage !== prevProps.currentPage) // Check if it's a new user
+		{
+			this.setState({ currentPage: this.props.currentPage });
+			this.render();
+		}
+	}
+
+	retrieveFiles = () => {
 		const { web3 } = this.state;
 
 		const contractsManager = new ContractsManager(web3);
@@ -21,19 +34,12 @@ class FileViewer extends Component {
 				res.forEach(fd => {
 					fd["downloading"] = false;
 					fd["favoriting"] = false; // "favoriting" is not a real word
+					fd["deleting"] = false;
 				});
 				this.setState({ filesDetails: res });
 			});
 		});
 	}
-
-	componentDidUpdate(prevProps) {
-		if(this.props.currentPage !== prevProps.currentPage) // Check if it's a new user
-		{
-			this.setState({currentPage: this.props.currentPage});
-		  this.render();
-		}
-	  } 
 
 	getIconFromExtension = (fileExtension) => {
 		switch (fileExtension) {
@@ -77,28 +83,46 @@ class FileViewer extends Component {
 			filesDetails.find(fd => fd.fileHash === file.fileHash).favoriting = false;
 			this.setState({ filesDetails });
 
-			await contractsManager.getFilesDetails().then((res) => {
-				res.forEach(fd => {
-					fd["downloading"] = false;
-					fd["favoriting"] = false; // "favoriting" is not a real word
-				});
-				this.setState({ filesDetails: res });
-			});
+			this.retrieveFiles();
 		});
-		
+
+	}
+
+	deleteFile = (file) => {
+		const { web3, filesDetails } = this.state;
+
+		filesDetails.find(fd => fd.fileHash === file.fileHash).deleting = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.deleteFile(file.fileHash, file.fileName);
+			filesDetails.find(fd => fd.fileHash === file.fileHash).deleting = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+
 	}
 
 	renderDownloading = () => {
 		return (
 			<div className="ui active inverted dimmer">
-				<div class="ui text loader">Downloading...</div>
+				<div className="ui text loader">Downloading...</div>
 			</div>);
 	}
 
 	renderFavoriting = () => {
 		return (
 			<div className="ui active inverted dimmer">
-				<div class="ui text loader">Changing Favorite...</div>
+				<div className="ui text loader">Changing Favorite...</div>
+			</div>);
+	}
+
+	renderDeleting = () => {
+		return (
+			<div className="ui active inverted dimmer">
+				<div className="ui text loader">Deleting...</div>
 			</div>);
 	}
 
@@ -116,11 +140,12 @@ class FileViewer extends Component {
 		}
 
 		return filesDetailsFiltered.map((fd, index) => {
-			const { fileExtension, fileHash, transactionDate, fileName, isFavorite, downloading, favoriting } = fd;
+			const { fileExtension, fileHash, transactionDate, fileName, isFavorite, downloading, favoriting, deleting } = fd;
 			return (
 				<div className="ui teal card" key={index}>
 					{downloading ? this.renderDownloading() : ""}
 					{favoriting ? this.renderFavoriting() : ""}
+					{deleting ? this.renderDeleting() : ""}
 					<div className="content">
 						<i className={this.getIconFromExtension(fileExtension)} style={{ fontSize: "30px" }}></i>
 					</div>
@@ -131,11 +156,20 @@ class FileViewer extends Component {
 						</div>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
-								<Dropdown.Item icon='icon download' text='Download' onClick={() => { this.downloadFile(fd) }} />
+								<div className="item" onClick={() => { this.downloadFile(fd) }}>
+        					<i className="download icon"></i>
+        					Download
+        				</div>
 								<RenameFilePopup fileHash={fileHash} fileName={fileName} web3={this.state.web3} />
-								<Dropdown.Item icon={isFavorite ? 'icon yellow star' : 'icon yellow outline star'} text={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'} onClick={() => { this.setFavorite(fd) }} />
+								<div className="item"onClick={() => { this.setFavorite(fd) }}>
+        					<i className={isFavorite ? 'yellow star icon' : 'yellow outline star icon'}></i>
+        					{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+        				</div>
 								<Dropdown.Divider />
-								<Dropdown.Item icon='icon red trash' text='Delete' />
+								<div className="item" onClick={() => { this.deleteFile(fd) }}>
+        					<i className="red trash icon"></i>
+        					Delete
+        				</div>
 							</Dropdown.Menu>
 						</Dropdown>
 					</div>

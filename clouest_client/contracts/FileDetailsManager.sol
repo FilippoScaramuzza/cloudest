@@ -39,6 +39,22 @@ contract FileDetailsManager {
             }));
     }
 
+    function deleteFile(string memory fileHash, string memory fileName) public {
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        uint index = 0;
+        for(uint i = 0; i < filesDetails.length; i++){
+            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) 
+            && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) {
+                index = i;
+            }
+        }
+
+        for (uint i = index; i < filesDetails.length-1; i++){
+            filesDetails[i] = filesDetails[i+1];
+        }
+        filesDetails.pop();
+    }
+
     /* 
      * TODO: description of returned values
     */
