@@ -19,10 +19,14 @@ class RenameFilePopup extends Component {
   renameFile = async (e) => {
     e.preventDefault();
     const { fileHash, fileName, newName, web3 } = this.state;
+
+    this.setState({loading: true});
+
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
       await contractsManager.renameFileName(fileHash, fileName, newName);
-      //window.location.reload();
+      this.setState({loading: false});
+      window.location.reload();
     });
   }
 

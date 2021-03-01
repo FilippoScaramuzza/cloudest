@@ -67,15 +67,23 @@ class ContractsManager extends Component{
 	renameFileName = async (fileHash, fileName, newName) => {
 		const { accounts, contract } = this;
 
-		console.log(fileHash);
-		console.log(fileName);
-		console.log(newName);
 		try {
-			await contract.methods.renameFileName(fileHash, fileName, newName).call({ from: accounts[0] });
+			await contract.methods.renameFileName(fileHash, fileName, newName).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}
 	}
+
+	setFavorite = async (fileHash, fileName, isFavorite) => {
+		const { accounts, contract } = this;
+
+		try {
+			await contract.methods.setFavorite(fileHash, fileName, isFavorite).send({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
 }
 
 export default ContractsManager;

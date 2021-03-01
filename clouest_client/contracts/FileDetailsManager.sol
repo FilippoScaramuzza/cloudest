@@ -17,6 +17,7 @@ contract FileDetailsManager {
         string fileName; // The file name
         string transactionDate; // The date in which file infos was stored
         string fileExtension; // The type of file (its extension)
+        bool isFavorite;
     }
 
     /*
@@ -33,7 +34,8 @@ contract FileDetailsManager {
                 fileHash: fileHash,
                 fileName: fileName,
                 fileExtension: fileType,
-                transactionDate: date
+                transactionDate: date,
+                isFavorite: false
             }));
     }
 
@@ -47,13 +49,23 @@ contract FileDetailsManager {
     }
 
     /*
-    * 
+     * 
     */
     function renameFileName(string memory fileHash, string memory fileName, string memory newName) public{
-        FileDetails[] memory fileToBeRetrieved = filesList[msg.sender];
-        for(uint i = 0; i < fileToBeRetrieved.length; i++){
-            if(keccak256(bytes(fileToBeRetrieved[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(fileToBeRetrieved[i].fileName)) == keccak256(bytes(fileName))) fileToBeRetrieved[i].fileName = newName;
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        for(uint i = 0; i < filesDetails.length; i++){
+            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) filesDetails[i].fileName = newName;
         }
     }
 
+
+    /*
+     *
+    */
+    function setFavorite(string memory fileHash, string memory fileName, bool  isFavorite) public{
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        for(uint i = 0; i < filesDetails.length; i++){
+            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) filesDetails[i].isFavorite = isFavorite;
+        }
+    }
 }

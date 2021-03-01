@@ -13,7 +13,7 @@ class AddFilePopup extends Component {
 
   fileInputOnChangeHandler = (e) => {
     //console.log(e.target.files[0]);
-    e.target.setAttribute("data-title", e.target.files[0].name + "\n(" + e.target.files[0].size + 0.000001 + " MB)");
+    e.target.setAttribute("data-title", e.target.files[0].name + "\n(" + e.target.files[0].size + " Bytes)");
     this.setState({file: e.target.files[0]})
   }
 
@@ -21,6 +21,7 @@ class AddFilePopup extends Component {
     e.preventDefault();
     const { file, web3 } = this.state;
     let fileHash = null;
+    this.setState({loading: true});
     /* UPLOAD FILES TO IPFS NETWORK */
     const ipfsManager = new IpfsManager();
     ipfsManager.init( async () => {
@@ -29,7 +30,6 @@ class AddFilePopup extends Component {
       if(fileHash != null){
         /* UPLOAD DETAILS TO CHAIN */
         const contractsManager = new ContractsManager(web3);
-        this.setState({loading: true});
         contractsManager.init( async () => {
         await contractsManager.loadDetailsToChain(fileHash, file);
         this.setState({loading: false});

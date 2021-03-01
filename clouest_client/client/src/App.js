@@ -88,9 +88,9 @@ class App extends Component {
                 <br /><br />
                 <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}
-                  onClick={() => this.changeCurrentPage("favorite")}>
+                  onClick={() => this.changeCurrentPage("favorites")}>
                   <i className="star icon"></i>
-            Favorite Files
+            Favorites Files
           </button>
 
         </div>
@@ -99,8 +99,7 @@ class App extends Component {
             <i className="teal folder icon"></i>
             {currentPage}
           </h1>
-
-          <FileViewer web3={web3}/>
+          <FileViewer web3={web3} currentPage={currentPage}/>
         </div>
       </div>
     );
