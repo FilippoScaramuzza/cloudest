@@ -18,7 +18,7 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    currentFolder: {id: "/", name: "root"}
+    currentFolder: {id: "/", name: "root", parentFolderId: "/"}
   }
 
   componentDidMount = async () => {
@@ -45,8 +45,8 @@ class App extends Component {
     this.setState({ currentPage });
   }
 
-  updateCurrentFolder = async (currentFolder) => {
-    await this.setState({currentFolder});
+  updateCurrentFolder = (currentFolder) => {
+    this.setState({currentFolder});
   }
 
   render() {
