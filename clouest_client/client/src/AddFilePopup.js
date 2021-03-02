@@ -8,6 +8,7 @@ class AddFilePopup extends Component {
   state = {
     file: null,
     web3: this.props["web3"],
+    currentFolder: this.props["currentFolder"],
     loading: false
   }
 
@@ -15,6 +16,14 @@ class AddFilePopup extends Component {
     var i = size === 0 ? 0 : Math.floor( Math.log(size) / Math.log(1024) );
     return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
   };
+
+  componentDidUpdate(prevProps) {
+		if (this.props.currentFolder !== prevProps.currentFolder) // Check if it's a new user
+		{
+			this.setState({ currentFolder: this.props.currentFolder });
+			this.render();
+		}
+	}
 
   fileInputOnChangeHandler = (e) => {
     //console.log(e.target.files[0]);
@@ -24,7 +33,7 @@ class AddFilePopup extends Component {
 
   uploadFile = async (e) => {
     e.preventDefault();
-    const { file, web3 } = this.state;
+    const { file, web3, currentFolder } = this.state;
     
     if (file == null) return; // avoid user clicking without loading file
 
@@ -39,7 +48,7 @@ class AddFilePopup extends Component {
         /* UPLOAD DETAILS TO CHAIN */
         const contractsManager = new ContractsManager(web3);
         contractsManager.init( async () => {
-        await contractsManager.addFile(uniqueId, file);
+        await contractsManager.addFile(uniqueId, file, currentFolder.id);
         this.setState({loading: false});
         window.location.reload();
         });
@@ -58,7 +67,7 @@ class AddFilePopup extends Component {
         <div className="modal">
           <h3 className="ui horizontal divider header">
             <i className="teal file icon"></i>
-            Add File
+            Add File to {this.state.currentFolder.name}
           </h3>
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
             <div className="form-group inputDnD">

@@ -33,7 +33,7 @@ class ContractsManager extends Component{
 		callback.bind(this)();
 	}
 
-	addFile = async (ipfsuniqueId, file) => {
+	addFile = async (ipfsuniqueId, file, parentFolderId) => {
 		
 		const { accounts, contract } = this;
 
@@ -43,14 +43,15 @@ class ContractsManager extends Component{
 		let yyyy = date.getFullYear();
 
 		date = mm + '/' + dd + '/' + yyyy;
+
 		try {
-			await contract.methods.addFile(ipfsuniqueId, file.name, file.type, date).send({ from: accounts[0] });
+			await contract.methods.addFile(ipfsuniqueId, file.name, file.type, date, parentFolderId).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}
 	}
 	
-	createFolder = async (name) => {
+	createFolder = async (name, parentFolderId) => {
 		const { accounts, contract } = this;
 		let date = new Date();
 		let dd = String(date.getDate()).padStart(2, '0');
@@ -59,7 +60,10 @@ class ContractsManager extends Component{
 
 		date = mm + '/' + dd + '/' + yyyy;
 		try {
-			await contract.methods.addFolder(name, date).send({ from: accounts[0] });
+			console.log(name);
+			console.log(date);
+			console.log(parentFolderId);
+			await contract.methods.addFolder(name, date, parentFolderId).send({ from: accounts[0] });
 			console.log(this.getFilesDetails());
 		} catch (error) {
 			console.log(error);

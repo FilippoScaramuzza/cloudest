@@ -26,13 +26,13 @@ class AddFolderPopup extends Component {
 
   createFolder = async (e) => {
     e.preventDefault();
-    const { name, web3 } = this.state;
+    const { name, web3, currentFolder } = this.state;
 
     this.setState({loading: true});
 
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
-      await contractsManager.createFolder(name);
+      await contractsManager.createFolder(name, currentFolder.id);
       this.setState({loading: false});
       window.location.reload();
     });
@@ -48,13 +48,13 @@ class AddFolderPopup extends Component {
         <div className="modal">
           <h3 className="ui horizontal divider header">
             <i className="teal folder icon"></i>
-            Add Folder to {this.state.currentFolder}
+            Add Folder to {this.state.currentFolder.name}
           </h3>
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
             <div className="ui action input">
               <input type="text" value={this.state.newName} onChange={this.fileInputOnChangeHandler} />
               <button className="ui teal right labeled icon button" onClick={this.createFolder}>
-                <i class="folder icon"></i>
+                <i className="folder icon"></i>
                 Add Folder
               </button>
             </div>

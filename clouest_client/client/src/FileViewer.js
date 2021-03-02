@@ -9,20 +9,24 @@ class FileViewer extends Component {
 		web3: this.props.web3,
 		currentPage: this.props.currentPage,
 		filesDetails: null,
-		updateCurrentFolder: this.props.updateCurrentFolder
+		updateCurrentFolder: this.props.updateCurrentFolder,
+		currentFolder: {
+			id: "/",
+			name: "root"
+		}
 	}
 
 	componentDidMount = async () => {
 		this.retrieveFiles();
-		this.state.updateCurrentFolder("Cartella dei merdoni");
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.currentPage !== prevProps.currentPage) // Check if it's a new user
-		{
+		if (this.props.currentPage !== prevProps.currentPage) {
 			this.setState({ currentPage: this.props.currentPage });
 			this.render();
 		}
+
+		
 	}
 
 	retrieveFiles = () => {
@@ -52,7 +56,7 @@ class FileViewer extends Component {
 			case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
 				return "teal file word outline icon";
 			case "folder":
-				return "teal folder outline icon"
+				return "inverted folder icon"
 			default:
 				return "teal file outline icon";
 		}
@@ -107,6 +111,12 @@ class FileViewer extends Component {
 
 	}
 
+	changeCurrentFolder = (uniqueId, name) => {
+		const { updateCurrentFolder } = this.state;
+		this.setState({ currentFolder: { id: uniqueId, name: name } })
+		updateCurrentFolder(this.state.currentFolder);
+	}
+
 	renderDownloading = () => {
 		return (
 			<div className="ui active inverted dimmer">
@@ -129,47 +139,51 @@ class FileViewer extends Component {
 	}
 
 	renderFilesDetails = () => {
-		const { filesDetails, currentPage } = this.state;
+		const { filesDetails, currentPage, currentFolder } = this.state;
 		if (filesDetails == null) return null;
 		let filesDetailsFiltered = null;
+
+		filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolderId === currentFolder.id);
+
 		switch (currentPage) {
 			case "favorites":
-				filesDetailsFiltered = filesDetails.filter(fd => fd.isFavorite === true);
+				filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.isFavorite === true);
 				break;
 			default:
-				filesDetailsFiltered = filesDetails;
 				break;
 		}
 
 		return filesDetailsFiltered.map((fd, index) => {
-			const { fileType, uniqueId, transactionDate, name, isFavorite, downloading, favoriting, deleting } = fd;
+			const { fileType, uniqueId, name, isFavorite, downloading, favoriting, deleting } = fd;
 			return (
-				<div className="ui teal card" key={index}>
+				<div className="ui teal card" key={index} onClick={fileType === "folder" ? () => { this.changeCurrentFolder(uniqueId, name) } : () => { }}>
 					{downloading ? this.renderDownloading() : ""}
 					{favoriting ? this.renderFavoriting() : ""}
 					{deleting ? this.renderDeleting() : ""}
-					<div className="content">
+					<div className="content" style={fileType === "folder" ? { backgroundColor: "#00ACA3", color: "white" } : null}>
 						<i className={this.getIconFromExtension(fileType)} style={{ fontSize: "30px" }}></i>
-					</div>
-					<div className="content">
-						<span className="header" onClick={() => { this.downloadFile(fd) }} data-tooltip={name} data-position="top center" style={{ cursor: "pointer" }} >{name.replace(/(.{16})..+/, "$1...")}</span>
-						<div className="meta">
-							<span className="date">{uniqueId}</span>
-						</div>
+						<br /><br />
+						<span className="header"
+							onClick={() => { this.downloadFile(fd) }}
+							data-tooltip={name}
+							data-position="top center"
+							style={fileType === "folder" ? { cursor: "pointer", color: "white" } : { cursor: "pointer" }} >
+							{name.replace(/(.{16})..+/, "$1...")}
+						</span>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
 								<div className="item" onClick={() => { this.downloadFile(fd) }}>
-        					<i className="download icon"></i>
+									<i className="download icon"></i>
         					Download
         				</div>
 								<RenameFilePopup uniqueId={uniqueId} name={name} web3={this.state.web3} />
-								<div className="item"onClick={() => { this.setFavorite(fd) }}>
-        					<i className={isFavorite ? 'yellow star icon' : 'yellow outline star icon'}></i>
-        					{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-        				</div>
+								<div className="item" onClick={() => { this.setFavorite(fd) }}>
+									<i className={isFavorite ? 'yellow star icon' : 'yellow outline star icon'}></i>
+									{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+								</div>
 								<Dropdown.Divider />
 								<div className="item" onClick={() => { this.deleteFile(fd) }}>
-        					<i className="red trash icon"></i>
+									<i className="red trash icon"></i>
         					Delete
         				</div>
 							</Dropdown.Menu>

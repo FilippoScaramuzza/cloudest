@@ -57,7 +57,7 @@ class IpfsManager {
 			method: "GET",
 			responseType: "arraybuffer", // important
 		}).then(res => {
-			fileDownload(Buffer.from(res.data), file.fileName);
+			fileDownload(Buffer.from(res.data), file.name);
 		});
 	}
 

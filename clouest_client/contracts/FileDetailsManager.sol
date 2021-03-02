@@ -17,6 +17,7 @@ contract FileDetailsManager {
         string name; // name of the folder or of the file.
         string transactionDate; // The date in which file infos was stored.
         string fileType; // "folder" if folder, the extension of the file otherwise.
+        string parentFolderId;
         bool isFavorite;
     }
 
@@ -29,12 +30,13 @@ contract FileDetailsManager {
      * When calling this function, the file's information are mapped to address 
      * of the user.
     */
-    function addFile(string memory uniqueId, string memory name, string memory fileType, string memory date) public {
+    function addFile(string memory uniqueId, string memory name, string memory fileType, string memory date, string memory parentFolderId) public {
         filesList[msg.sender].push(FileDetails({
                 uniqueId: uniqueId,
                 name: name,
                 fileType: fileType,
                 transactionDate: date,
+                parentFolderId: parentFolderId,
                 isFavorite: false
             }));
     }
@@ -43,36 +45,16 @@ contract FileDetailsManager {
      * When calling this function, the folder's information are mapped to address 
      * of the user.
     */
-    function addFolder(string memory name, string memory date) public {
+    function addFolder(string memory name, string memory date, string memory parentFolderId) public {
         filesList[msg.sender].push(FileDetails({
                 uniqueId: uint2str(folderId),
                 name: name,
                 fileType: "folder",
                 transactionDate: date,
+                parentFolderId: parentFolderId,
                 isFavorite: false
             }));
         folderId++;
-    }
-
-
-    
-    function uint2str(uint i) internal pure returns (string memory uintAsString) {
-        if (i == 0) {
-            return "0";
-        }
-        uint j = i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint k = len - 1;
-        while (i != 0) {
-            bstr[k--] = byte(uint8(48 + i % 10));
-            i /= 10;
-        }
-        return string(bstr);
     }
 
     function deleteFile(string memory uniqueId, string memory name) public {
@@ -119,5 +101,24 @@ contract FileDetailsManager {
         for(uint i = 0; i < filesDetails.length; i++){
             if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) filesDetails[i].isFavorite = isFavorite;
         }
+    }
+
+    function uint2str(uint i) internal pure returns (string memory uintAsString) {
+        if (i == 0) {
+            return "0";
+        }
+        uint j = i;
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint k = len - 1;
+        while (i != 0) {
+            bstr[k--] = byte(uint8(48 + i % 10));
+            i /= 10;
+        }
+        return string(bstr);
     }
 }

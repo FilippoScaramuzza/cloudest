@@ -18,7 +18,7 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    currentFolder: "/"
+    currentFolder: {id: "/", name: "root"}
   }
 
   componentDidMount = async () => {
