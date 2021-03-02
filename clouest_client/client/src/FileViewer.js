@@ -41,16 +41,18 @@ class FileViewer extends Component {
 		});
 	}
 
-	getIconFromExtension = (fileExtension) => {
-		switch (fileExtension) {
+	getIconFromExtension = (fileType) => {
+		switch (fileType) {
 			case "application/pdf":
 				return "teal file pdf outline icon";
 			case "image/png":
 				return "teal file image outline icon";
 			case "image/jpg":
-				return "teal file image outline icon"
+				return "teal file image outline icon";
 			case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-				return "teal file word outline icon"
+				return "teal file word outline icon";
+			case "folder":
+				return "teal folder outline icon"
 			default:
 				return "teal file outline icon";
 		}
@@ -60,13 +62,13 @@ class FileViewer extends Component {
 		let { filesDetails } = this.state;
 		const ipfsManager = new IpfsManager();
 
-		filesDetails.find(fd => fd.fileHash === file.fileHash).downloading = true;
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).downloading = true;
 
 		this.setState({ filesDetails });
 
 		ipfsManager.init(async () => {
 			await ipfsManager.retrieveFile(file);
-			filesDetails.find(fd => fd.fileHash === file.fileHash).downloading = false;
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).downloading = false;
 			this.setState({ filesDetails });
 		});
 	}
@@ -74,13 +76,13 @@ class FileViewer extends Component {
 	setFavorite = (file) => {
 		const { web3, filesDetails } = this.state;
 
-		filesDetails.find(fd => fd.fileHash === file.fileHash).favoriting = true;
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).favoriting = true;
 		this.setState({ filesDetails });
 
 		const contractsManager = new ContractsManager(web3);
 		contractsManager.init(async () => {
-			await contractsManager.setFavorite(file.fileHash, file.fileName, !file.isFavorite);
-			filesDetails.find(fd => fd.fileHash === file.fileHash).favoriting = false;
+			await contractsManager.setFavorite(file.uniqueId, file.name, !file.isFavorite);
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).favoriting = false;
 			this.setState({ filesDetails });
 
 			this.retrieveFiles();
@@ -91,13 +93,13 @@ class FileViewer extends Component {
 	deleteFile = (file) => {
 		const { web3, filesDetails } = this.state;
 
-		filesDetails.find(fd => fd.fileHash === file.fileHash).deleting = true;
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = true;
 		this.setState({ filesDetails });
 
 		const contractsManager = new ContractsManager(web3);
 		contractsManager.init(async () => {
-			await contractsManager.deleteFile(file.fileHash, file.fileName);
-			filesDetails.find(fd => fd.fileHash === file.fileHash).deleting = false;
+			await contractsManager.deleteFile(file.uniqueId, file.name);
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = false;
 			this.setState({ filesDetails });
 
 			this.retrieveFiles();
@@ -140,19 +142,19 @@ class FileViewer extends Component {
 		}
 
 		return filesDetailsFiltered.map((fd, index) => {
-			const { fileExtension, fileHash, transactionDate, fileName, isFavorite, downloading, favoriting, deleting } = fd;
+			const { fileType, uniqueId, transactionDate, name, isFavorite, downloading, favoriting, deleting } = fd;
 			return (
 				<div className="ui teal card" key={index}>
 					{downloading ? this.renderDownloading() : ""}
 					{favoriting ? this.renderFavoriting() : ""}
 					{deleting ? this.renderDeleting() : ""}
 					<div className="content">
-						<i className={this.getIconFromExtension(fileExtension)} style={{ fontSize: "30px" }}></i>
+						<i className={this.getIconFromExtension(fileType)} style={{ fontSize: "30px" }}></i>
 					</div>
 					<div className="content">
-						<span className="header" onClick={() => { this.downloadFile(fd) }} data-tooltip={fileName} data-position="top center" style={{ cursor: "pointer" }} >{fileName.replace(/(.{16})..+/, "$1...")}</span>
+						<span className="header" onClick={() => { this.downloadFile(fd) }} data-tooltip={name} data-position="top center" style={{ cursor: "pointer" }} >{name.replace(/(.{16})..+/, "$1...")}</span>
 						<div className="meta">
-							<span className="date">{transactionDate}</span>
+							<span className="date">{uniqueId}</span>
 						</div>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
@@ -160,7 +162,7 @@ class FileViewer extends Component {
         					<i className="download icon"></i>
         					Download
         				</div>
-								<RenameFilePopup fileHash={fileHash} fileName={fileName} web3={this.state.web3} />
+								<RenameFilePopup uniqueId={uniqueId} name={name} web3={this.state.web3} />
 								<div className="item"onClick={() => { this.setFavorite(fd) }}>
         					<i className={isFavorite ? 'yellow star icon' : 'yellow outline star icon'}></i>
         					{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}

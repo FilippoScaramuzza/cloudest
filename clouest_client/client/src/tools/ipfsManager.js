@@ -53,7 +53,7 @@ class IpfsManager {
 	
 	retrieveFile = async (file) => {
 		await Axios({
-			url: 'https://ipfs.io/ipfs/' + file.fileHash,
+			url: 'https://ipfs.io/ipfs/' + file.uniqueId,
 			method: "GET",
 			responseType: "arraybuffer", // important
 		}).then(res => {
@@ -61,9 +61,9 @@ class IpfsManager {
 		});
 	}
 
-	getLink = (fileHash) => {
-		if (fileHash != null) {
-			return "https://ipfs.io/ipfs/" + fileHash;
+	getLink = (uniqueId) => {
+		if (uniqueId != null) {
+			return "https://ipfs.io/ipfs/" + uniqueId;
 		}
 		return;
 	}

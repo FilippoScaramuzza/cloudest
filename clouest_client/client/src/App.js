@@ -74,9 +74,8 @@ class App extends Component {
           <img className="main-logo-img" alt="Cloudest" src={logo} />
 
           <br /><br />
-          <AddFilePopup web3={web3}/>
+          <AddFilePopup web3={web3} currentFolder={currentFolder}/>
           <AddFolderPopup web3={web3} currentFolder={currentFolder}/>
-          {console.log(currentFolder)}
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}

@@ -33,7 +33,7 @@ class ContractsManager extends Component{
 		callback.bind(this)();
 	}
 
-	loadDetailsToChain = async (ipfsFileHash, file) => {
+	addFile = async (ipfsuniqueId, file) => {
 		
 		const { accounts, contract } = this;
 
@@ -43,15 +43,29 @@ class ContractsManager extends Component{
 		let yyyy = date.getFullYear();
 
 		date = mm + '/' + dd + '/' + yyyy;
-		console.log(accounts);
 		try {
-			await contract.methods.addFile(ipfsFileHash, file.name, file.type, date).send({ from: accounts[0] });
+			await contract.methods.addFile(ipfsuniqueId, file.name, file.type, date).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}
-        //console.log(await contract.methods.getFiles().call({ from: accounts[0] }));
 	}
 	
+	createFolder = async (name) => {
+		const { accounts, contract } = this;
+		let date = new Date();
+		let dd = String(date.getDate()).padStart(2, '0');
+		let mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+		let yyyy = date.getFullYear();
+
+		date = mm + '/' + dd + '/' + yyyy;
+		try {
+			await contract.methods.addFolder(name, date).send({ from: accounts[0] });
+			console.log(this.getFilesDetails());
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
 	getFilesDetails = async () => {
 		const { accounts, contract } = this;
 		let filesDetails = null;
@@ -64,31 +78,31 @@ class ContractsManager extends Component{
 		return filesDetails;
 	}
 
-	renameFileName = async (fileHash, fileName, newName) => {
+	renameFile = async (uniqueId, name, newName) => {
 		const { accounts, contract } = this;
 
 		try {
-			await contract.methods.renameFileName(fileHash, fileName, newName).send({ from: accounts[0] });
+			await contract.methods.renameFileName(uniqueId, name, newName).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	setFavorite = async (fileHash, fileName, isFavorite) => {
+	setFavorite = async (uniqueId, name, isFavorite) => {
 		const { accounts, contract } = this;
 
 		try {
-			await contract.methods.setFavorite(fileHash, fileName, isFavorite).send({ from: accounts[0] });
+			await contract.methods.setFavorite(uniqueId, name, isFavorite).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	deleteFile = async (fileHash, fileName) => {
+	deleteFile = async (uniqueId, name) => {
 		const { accounts, contract } = this;
 
 		try {
-			await contract.methods.deleteFile(fileHash, fileName).send({ from: accounts[0] });
+			await contract.methods.deleteFile(uniqueId, name).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}

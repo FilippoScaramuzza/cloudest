@@ -8,6 +8,7 @@ class AddFolderPopup extends Component {
     file: null,
     web3: this.props["web3"],
     currentFolder: this.props["currentFolder"],
+    name: "",
     loading: false
   }
 
@@ -20,18 +21,18 @@ class AddFolderPopup extends Component {
 	}
 
   fileInputOnChangeHandler = (e) => {
-    this.setState({newName: e.target.value});
+    this.setState({name: e.target.value});
   }
 
-  renameFile = async (e) => {
+  createFolder = async (e) => {
     e.preventDefault();
-    const { fileHash, fileName, newName, web3 } = this.state;
+    const { name, web3 } = this.state;
 
     this.setState({loading: true});
 
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
-      await contractsManager.renameFileName(fileHash, fileName, newName);
+      await contractsManager.createFolder(name);
       this.setState({loading: false});
       window.location.reload();
     });
@@ -52,7 +53,7 @@ class AddFolderPopup extends Component {
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
             <div className="ui action input">
               <input type="text" value={this.state.newName} onChange={this.fileInputOnChangeHandler} />
-              <button className="ui teal right labeled icon button" onClick={this.renameFile}>
+              <button className="ui teal right labeled icon button" onClick={this.createFolder}>
                 <i class="folder icon"></i>
                 Add Folder
               </button>

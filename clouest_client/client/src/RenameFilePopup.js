@@ -5,9 +5,9 @@ import ContractsManager from './tools/ContractsManager';
 
 class RenameFilePopup extends Component {
   state = {
-    fileName: this.props["fileName"],
-    newName: this.props["fileName"],
-    fileHash: this.props["fileHash"],
+    name: this.props["name"],
+    newName: this.props["name"],
+    uniqueId: this.props["uniqueId"],
     web3: this.props["web3"],
     loading: false
   }
@@ -18,13 +18,13 @@ class RenameFilePopup extends Component {
 
   renameFile = async (e) => {
     e.preventDefault();
-    const { fileHash, fileName, newName, web3 } = this.state;
+    const { uniqueId, name, newName, web3 } = this.state;
 
     this.setState({loading: true});
 
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
-      await contractsManager.renameFileName(fileHash, fileName, newName);
+      await contractsManager.renameFile(uniqueId, name, newName);
       this.setState({loading: false});
       window.location.reload();
     });

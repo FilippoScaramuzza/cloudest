@@ -28,18 +28,18 @@ class AddFilePopup extends Component {
     
     if (file == null) return; // avoid user clicking without loading file
 
-    let fileHash = null;
+    let uniqueId = null;
     this.setState({loading: true});
     /* UPLOAD FILES TO IPFS NETWORK */
     const ipfsManager = new IpfsManager();
     ipfsManager.init( async () => {
-      fileHash = await ipfsManager.uploadFile(file);
-      console.log(fileHash);
-      if(fileHash != null){
+      uniqueId = await ipfsManager.uploadFile(file);
+      console.log(uniqueId);
+      if(uniqueId != null){
         /* UPLOAD DETAILS TO CHAIN */
         const contractsManager = new ContractsManager(web3);
         contractsManager.init( async () => {
-        await contractsManager.loadDetailsToChain(fileHash, file);
+        await contractsManager.addFile(uniqueId, file);
         this.setState({loading: false});
         window.location.reload();
         });

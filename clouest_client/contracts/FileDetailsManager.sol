@@ -10,13 +10,13 @@ pragma experimental ABIEncoderV2;
 contract FileDetailsManager {
 
     /*
-     * Structure for file's details.
+     * Structure for files' details and folders' details.
     */
     struct FileDetails {
-        string fileHash; // The IPFS file hash
-        string fileName; // The file name
-        string transactionDate; // The date in which file infos was stored
-        string fileExtension; // The type of file (its extension)
+        string uniqueId; // If isFolder==true -> unique id of the folder, otherwise it's IPFS fileHash.
+        string name; // name of the folder or of the file.
+        string transactionDate; // The date in which file infos was stored.
+        string fileType; // "folder" if folder, the extension of the file otherwise.
         bool isFavorite;
     }
 
@@ -24,27 +24,63 @@ contract FileDetailsManager {
      * Mapping file details with users account address
     */
     mapping(address => FileDetails[]) filesList;
-
+    uint folderId = 0;
     /* 
      * When calling this function, the file's information are mapped to address 
      * of the user.
     */
-    function addFile(string memory fileHash, string memory fileName, string memory fileType, string memory date) public {
+    function addFile(string memory uniqueId, string memory name, string memory fileType, string memory date) public {
         filesList[msg.sender].push(FileDetails({
-                fileHash: fileHash,
-                fileName: fileName,
-                fileExtension: fileType,
+                uniqueId: uniqueId,
+                name: name,
+                fileType: fileType,
                 transactionDate: date,
                 isFavorite: false
             }));
     }
 
-    function deleteFile(string memory fileHash, string memory fileName) public {
+    /* 
+     * When calling this function, the folder's information are mapped to address 
+     * of the user.
+    */
+    function addFolder(string memory name, string memory date) public {
+        filesList[msg.sender].push(FileDetails({
+                uniqueId: uint2str(folderId),
+                name: name,
+                fileType: "folder",
+                transactionDate: date,
+                isFavorite: false
+            }));
+        folderId++;
+    }
+
+
+    
+    function uint2str(uint i) internal pure returns (string memory uintAsString) {
+        if (i == 0) {
+            return "0";
+        }
+        uint j = i;
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint k = len - 1;
+        while (i != 0) {
+            bstr[k--] = byte(uint8(48 + i % 10));
+            i /= 10;
+        }
+        return string(bstr);
+    }
+
+    function deleteFile(string memory uniqueId, string memory name) public {
         FileDetails[] storage filesDetails = filesList[msg.sender];
         uint index = 0;
         for(uint i = 0; i < filesDetails.length; i++){
-            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) 
-            && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) {
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) 
+            && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) {
                 index = i;
             }
         }
@@ -67,10 +103,10 @@ contract FileDetailsManager {
     /*
      * 
     */
-    function renameFileName(string memory fileHash, string memory fileName, string memory newName) public{
+    function renameFileName(string memory uniqueId, string memory name, string memory newName) public{
         FileDetails[] storage filesDetails = filesList[msg.sender];
         for(uint i = 0; i < filesDetails.length; i++){
-            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) filesDetails[i].fileName = newName;
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) filesDetails[i].name = newName;
         }
     }
 
@@ -78,10 +114,10 @@ contract FileDetailsManager {
     /*
      *
     */
-    function setFavorite(string memory fileHash, string memory fileName, bool  isFavorite) public{
+    function setFavorite(string memory uniqueId, string memory name, bool  isFavorite) public{
         FileDetails[] storage filesDetails = filesList[msg.sender];
         for(uint i = 0; i < filesDetails.length; i++){
-            if(keccak256(bytes(filesDetails[i].fileHash)) == keccak256(bytes(fileHash)) && keccak256(bytes(filesDetails[i].fileName)) == keccak256(bytes(fileName))) filesDetails[i].isFavorite = isFavorite;
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) filesDetails[i].isFavorite = isFavorite;
         }
     }
 }
