@@ -7,10 +7,11 @@ import IpfsManager from './tools/IpfsManager';
 class AddFilePopup extends Component {
   state = {
     file: null,
-    web3: this.props["web3"],
-    currentFolder: this.props["currentFolder"],
-    path: this.props["path"],
-    loading: false
+    web3: this.props.web3,
+    currentFolder: this.props.currentFolder,
+    path: this.props.path,
+    loading: false,
+    updateFileViwer: this.props.updateFileViwer,
   }
 
   humanFileSize = (size) => {
@@ -54,8 +55,8 @@ class AddFilePopup extends Component {
         const contractsManager = new ContractsManager(web3);
         contractsManager.init( async () => {
         await contractsManager.addFile(uniqueId, file, currentFolder.id);
-        this.setState({loading: false});
-        window.location.reload();
+        this.setState({loading: false, open: false});
+        this.state.updateFileViwer();
         });
       }
     });
@@ -74,7 +75,7 @@ class AddFilePopup extends Component {
 
   render() {
     return (
-      <Popup trigger={<button className="ui teal right labeled icon button"
+      <Popup open={this.state.open} onClose={() => this.setState({open: undefined})} trigger={<button className="ui teal right labeled icon button"
         style={{ borderRadius: "50px" }} >
         <i className="add icon" ></i>
           File

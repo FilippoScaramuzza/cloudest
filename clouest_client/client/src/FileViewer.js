@@ -52,8 +52,6 @@ class FileViewer extends Component {
 					}
 				});
 
-				console.log(res);
-
 				this.setState({ filesDetails: res });
 			});
 		});

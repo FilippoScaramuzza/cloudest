@@ -23,7 +23,8 @@ class App extends Component {
 			id: "/",
 			name: "root",
 			parentFolderId: "/"
-		}]
+		}],
+    fileViewer: React.createRef()
   }
 
   componentDidMount = async () => {
@@ -55,6 +56,10 @@ class App extends Component {
     this.setState({path});
   }
 
+  updateFileViwer = () => {
+    this.state.fileViewer.current.retrieveFiles();
+  }
+
   render() {
     const { currentPage, currentFolder, path, web3 } = this.state;
 
@@ -80,8 +85,8 @@ class App extends Component {
           <img className="main-logo-img" alt="Cloudest" src={logo} />
 
           <br /><br />
-          <AddFilePopup web3={web3} currentFolder={currentFolder} path={path}/>
-          <AddFolderPopup web3={web3} currentFolder={currentFolder}  path={path}/>
+          <AddFilePopup web3={web3} currentFolder={currentFolder} path={path} updateFileViwer={this.updateFileViwer}/>
+          <AddFolderPopup web3={web3} currentFolder={currentFolder}  path={path} updateFileViwer={this.updateFileViwer}/>
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}
@@ -112,7 +117,7 @@ class App extends Component {
             <i className="teal folder icon"></i>
             {currentPage}
           </h1>
-          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} />
+          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer}/>
         </div>
       </div>
     );

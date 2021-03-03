@@ -6,9 +6,10 @@ import ContractsManager from './tools/ContractsManager';
 class AddFolderPopup extends Component {
   state = {
     file: null,
-    web3: this.props["web3"],
-    currentFolder: this.props["currentFolder"],
-    path: this.props["path"],
+    web3: this.props.web3,
+    currentFolder: this.props.currentFolder,
+    path: this.props.path,
+    updateFileViwer: this.props.updateFileViwer,
     name: "",
     loading: false
   }
@@ -39,8 +40,8 @@ class AddFolderPopup extends Component {
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
       await contractsManager.createFolder(name, currentFolder.id);
-      this.setState({loading: false});
-      window.location.reload();
+      this.setState({loading: false, open: false});
+      this.state.updateFileViwer();
     });
   }
 
@@ -56,7 +57,7 @@ class AddFolderPopup extends Component {
 
   render() {
     return (
-      <Popup trigger={<button className="ui teal right labeled icon button"
+      <Popup open={this.state.open} onClose={() => this.setState({open: undefined})} trigger={<button className="ui teal right labeled icon button"
       style={{ borderRadius: "50px" }} >
       <i className="add icon" ></i>
         Folder
@@ -64,12 +65,12 @@ class AddFolderPopup extends Component {
         <div className="modal">
           <h3 className="ui horizontal divider header">
             <i className="teal folder icon"></i>
-            Add Folder to {this.state.currentFolder.name}
+            Add Folder
           </h3>
           <div style={{textAlign: "center"}}>{this.renderPath()}</div>
           <br/>
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
-            <div className="ui action input">
+            <div className="ui action input" style={{width: "100%"}}>
               <input type="text" value={this.state.newName} onChange={this.fileInputOnChangeHandler} />
               <button className="ui teal right labeled icon button" onClick={this.createFolder}>
                 <i className="folder icon"></i>
