@@ -18,7 +18,12 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    currentFolder: {id: "/", name: "root", parentFolderId: "/"}
+    currentFolder: {id: "/", name: "root", parentFolderId: "/"},
+    path: [{
+			id: "/",
+			name: "root",
+			parentFolderId: "/"
+		}]
   }
 
   componentDidMount = async () => {
@@ -45,12 +50,13 @@ class App extends Component {
     this.setState({ currentPage });
   }
 
-  updateCurrentFolder = (currentFolder) => {
+  updateCurrentFolder = (currentFolder, path) => {
     this.setState({currentFolder});
+    this.setState({path});
   }
 
   render() {
-    const { currentPage, currentFolder, web3 } = this.state;
+    const { currentPage, currentFolder, path, web3 } = this.state;
 
     if (!web3) {
       return (
@@ -74,8 +80,8 @@ class App extends Component {
           <img className="main-logo-img" alt="Cloudest" src={logo} />
 
           <br /><br />
-          <AddFilePopup web3={web3} currentFolder={currentFolder}/>
-          <AddFolderPopup web3={web3} currentFolder={currentFolder}/>
+          <AddFilePopup web3={web3} currentFolder={currentFolder} path={path}/>
+          <AddFolderPopup web3={web3} currentFolder={currentFolder}  path={path}/>
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
                   style={{ width: "70%" }}

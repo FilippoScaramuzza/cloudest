@@ -111,6 +111,16 @@ class ContractsManager extends Component{
 			console.log(error);
 		}
 	}
+
+	deleteFolder = async (uniqueId) => {
+		const { accounts, contract } = this;
+
+		try {
+			await contract.methods.deleteFolder(uniqueId).send({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+	}
 }
 
 export default ContractsManager;

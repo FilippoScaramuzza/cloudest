@@ -9,6 +9,7 @@ class AddFilePopup extends Component {
     file: null,
     web3: this.props["web3"],
     currentFolder: this.props["currentFolder"],
+    path: this.props["path"],
     loading: false
   }
 
@@ -17,12 +18,17 @@ class AddFilePopup extends Component {
     return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
   };
 
-  componentDidUpdate(prevProps) {
-		if (this.props.currentFolder !== prevProps.currentFolder) // Check if it's a new user
+  async componentDidUpdate(prevProps) {
+		if (this.props.currentFolder !== prevProps.currentFolder)
 		{
-			this.setState({ currentFolder: this.props.currentFolder });
+			await this.setState({ currentFolder: this.props.currentFolder});
 			this.render();
 		}
+    if(this.props.path !== prevProps.path)
+    {
+      await this.setState({ path: this.props.path });
+			this.render();
+    }
 	}
 
   fileInputOnChangeHandler = (e) => {
@@ -43,7 +49,6 @@ class AddFilePopup extends Component {
     const ipfsManager = new IpfsManager();
     ipfsManager.init( async () => {
       uniqueId = await ipfsManager.uploadFile(file);
-      console.log(uniqueId);
       if(uniqueId != null){
         /* UPLOAD DETAILS TO CHAIN */
         const contractsManager = new ContractsManager(web3);
@@ -57,6 +62,16 @@ class AddFilePopup extends Component {
 
   }
 
+  renderPath = () => {
+		const { path } = this.state;
+		return path.map((folder, index) => {
+			return (<><div class="ui icon label" key={index} style={{marginBottom: "5px"}}>
+						<i className="folder icon" />
+						{folder.name}
+		  			</div>{index!==path.length-1 ? ">" : ""}</>);
+		});
+	}
+
   render() {
     return (
       <Popup trigger={<button className="ui teal right labeled icon button"
@@ -67,8 +82,9 @@ class AddFilePopup extends Component {
         <div className="modal">
           <h3 className="ui horizontal divider header">
             <i className="teal file icon"></i>
-            Add File to {this.state.currentFolder.name}
+            Add File
           </h3>
+          <div style={{textAlign: "center"}}>{this.renderPath()}</div>
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
             <div className="form-group inputDnD">
               <input type="file" className="form-control-file text-danger font-weight-bold" id="inputFile" data-title="Click here to select a file or Drag and Drop it."

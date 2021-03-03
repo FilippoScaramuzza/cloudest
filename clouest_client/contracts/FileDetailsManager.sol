@@ -73,6 +73,33 @@ contract FileDetailsManager {
         filesDetails.pop();
     }
 
+    function deleteFolder(string memory uniqueId) public {
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        uint index = 0;
+        for(uint i = 0; i < filesDetails.length; i++){
+
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId))){
+                index = i;
+                for(uint j = 0; j < filesDetails.length; j++){
+                    
+                    if( keccak256(bytes(filesDetails[j].parentFolderId)) == keccak256(bytes(filesDetails[i].uniqueId)) ){
+                        if( keccak256(bytes(filesDetails[j].fileType)) == keccak256(bytes("folder")) ){
+                            deleteFolder(filesDetails[j].uniqueId);
+                        }   
+                        if( keccak256(bytes(filesDetails[j].fileType)) != keccak256(bytes("folder")) ){
+                            deleteFile(filesDetails[j].uniqueId, filesDetails[j].name);
+                        }
+                    }
+                } 
+            }
+        }
+
+        for (uint i = index; i < filesDetails.length-1; i++){
+            filesDetails[i] = filesDetails[i+1];
+        }
+        filesDetails.pop();
+    }
+
     /* 
      * TODO: description of returned values
     */

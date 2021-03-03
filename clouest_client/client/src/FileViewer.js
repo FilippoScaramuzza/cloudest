@@ -14,7 +14,12 @@ class FileViewer extends Component {
 			id: "/",
 			name: "root",
 			parentFolderId: "/"
-		}
+		},
+		path: [{
+			id: "/",
+			name: "root",
+			parentFolderId: "/"
+		}]
 	}
 
 	componentDidMount = async () => {
@@ -46,6 +51,8 @@ class FileViewer extends Component {
 					  res.unshift(fd);
 					}
 				});
+
+				console.log(res);
 
 				this.setState({ filesDetails: res });
 			});
@@ -117,17 +124,37 @@ class FileViewer extends Component {
 		});
 	}
 
+	deleteFolder = (folder) => {
+		const { web3, filesDetails } = this.state;
+	
+		filesDetails.find(fd => fd.uniqueId === folder.uniqueId).deleting = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.deleteFolder(folder.uniqueId);
+			filesDetails.find(fd => fd.uniqueId === folder.uniqueId).deleting = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
 	changeCurrentFolder = async (uniqueId, name, parentFolderId) => {
-		const { updateCurrentFolder } = this.state;
+		let { updateCurrentFolder,  path} = this.state;
 		await this.setState({ currentFolder: { id: uniqueId, name: name, parentFolderId: parentFolderId} })
-		updateCurrentFolder(this.state.currentFolder);
+		path.push(this.state.currentFolder)
+		await this.setState({ path })
+		updateCurrentFolder(this.state.currentFolder, path);
 	}
 
 	goToParentFolder = async () => {
 		const { updateCurrentFolder, filesDetails, currentFolder } = this.state;
+		let {path} = this.state;
+		path.pop()
 		let parentFolder = currentFolder.parentFolderId==="/" ?  { uniqueId: "/", name: "root", parentFolderId: "/"} : filesDetails.filter(fd => fd.uniqueId === currentFolder.parentFolderId)[0];
-		await this.setState({ currentFolder: { id: parentFolder.uniqueId, name: parentFolder.name, parentFolderId: parentFolder.parentFolderId} })
-		updateCurrentFolder(this.state.currentFolder);
+		await this.setState({ currentFolder: { id: parentFolder.uniqueId, name: parentFolder.name, parentFolderId: parentFolder.parentFolderId}, path })
+		updateCurrentFolder(this.state.currentFolder, path);
 	}
 
 	renderDownloading = () => {
@@ -182,7 +209,7 @@ class FileViewer extends Component {
 								<Dropdown.Divider />
 								<div className="item" onClick={() => { this.deleteFile(fd) }}>
 									<i className="red trash icon"></i>
-        							Deletekk
+        							Delete
         						</div>
 							</Dropdown.Menu>
 						</Dropdown>
@@ -209,7 +236,7 @@ class FileViewer extends Component {
 							<Dropdown.Menu>
 								<RenameFilePopup uniqueId={uniqueId} name={name} web3={this.state.web3} />
 								<Dropdown.Divider />
-								<div className="item" onClick={() => { this.deleteFile(fd) }}>
+								<div className="item" onClick={() => { this.deleteFolder(fd) }}>
 									<i className="red trash icon"></i>
         							Delete
         						</div>
@@ -244,7 +271,6 @@ class FileViewer extends Component {
 				break;
 		}
 
-
 		return filesDetailsFiltered.map((fd, index) => {
 			if(fd.fileType !== "folder") {
 				return this.renderFile(fd, index);
@@ -255,13 +281,33 @@ class FileViewer extends Component {
 		});
 	}
 
+	renderPath = () => {
+		const { path } = this.state;
+		return path.map((folder, index) => {
+			return (<><div className="ui icon label" key={index}>
+						<i className="folder icon"/>
+						{folder.name}
+		  			</div>{index!==path.length-1 ? ">" : ""}</>);
+		});
+	}
+
 	render() {
 		const { currentFolder } = this.state;
 		if(currentFolder.id === "/") return (
+			<>
+			<span> 
+				{this.renderPath()}
+			</span>
+			<br/><br/>
 			<div className="ui eight doubling cards">
 				{this.renderFilesDetails()}
-			</div>);
+			</div></>);
 		else return (
+			<>
+			<span>
+				{this.renderPath()}
+			</span>
+			<br/><br/>
 			<div className="ui eight doubling cards">
 				<div className="ui teal card" onClick={() => { this.goToParentFolder() }}>
 					<div className="content" style={{ backgroundColor: "#00ACA3", color: "white" }}>
@@ -273,10 +319,12 @@ class FileViewer extends Component {
 							style={{ cursor: "pointer"}} >
 							<i className="inverted arrow left icon" style={{ fontSize: "15px" }}></i>
 						</span>
+						<br/>
 					</div>
 				</div>
 				{this.renderFilesDetails()}
 			</div>
+			</>
 		);
 	}
 }
