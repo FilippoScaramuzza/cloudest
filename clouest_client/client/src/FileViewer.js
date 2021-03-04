@@ -141,7 +141,18 @@ class FileViewer extends Component {
 	changeCurrentFolder = async (uniqueId, name, parentFolderId) => {
 		let { updateCurrentFolder,  path} = this.state;
 		await this.setState({ currentFolder: { id: uniqueId, name: name, parentFolderId: parentFolderId} })
-		path.push(this.state.currentFolder)
+
+		let found = false;
+		for(let i = 0; i < path.length; i++){
+			if(path[i].id === uniqueId) {
+				path.length = i + 1;
+				found = true;
+			}
+		}
+		if(!found) {
+			path.push(this.state.currentFolder)
+		}
+
 		await this.setState({ path })
 		updateCurrentFolder(this.state.currentFolder, path);
 	}
@@ -282,7 +293,7 @@ class FileViewer extends Component {
 	renderPath = () => {
 		const { path } = this.state;
 		return path.map((folder, index) => {
-			return (<><div className="ui icon label" key={index}>
+			return (<><div className="ui icon label" key={index} style={{cursor: "pointer"}} onClick={() => this.changeCurrentFolder(folder.id, folder.name, folder.parentFolderId)}>
 						<i className="folder icon"/>
 						{folder.name}
 		  			</div>{index!==path.length-1 ? ">" : ""}</>);
