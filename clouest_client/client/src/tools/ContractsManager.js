@@ -60,11 +60,7 @@ class ContractsManager extends Component{
 
 		date = mm + '/' + dd + '/' + yyyy;
 		try {
-			console.log(name);
-			console.log(date);
-			console.log(parentFolderId);
 			await contract.methods.addFolder(name, date, parentFolderId).send({ from: accounts[0] });
-			console.log(this.getFilesDetails());
 		} catch (error) {
 			console.log(error);
 		}
@@ -97,6 +93,15 @@ class ContractsManager extends Component{
 
 		try {
 			await contract.methods.setFavorite(uniqueId, name, isFavorite).send({ from: accounts[0] });
+		} catch (error) {
+			console.log(error);
+		}
+	}
+	moveToTrash = async (uniqueId, name) => {
+		const { accounts, contract } = this;
+
+		try {
+			await contract.methods.moveToTrash(uniqueId, name).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}

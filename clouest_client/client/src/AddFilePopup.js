@@ -12,6 +12,8 @@ class AddFilePopup extends Component {
     path: this.props.path,
     loading: false,
     updateFileViwer: this.props.updateFileViwer,
+    uploadingToIpfs: false,
+    uploadingToBlockchain: false
   }
 
   humanFileSize = (size) => {
@@ -45,17 +47,18 @@ class AddFilePopup extends Component {
     if (file == null) return; // avoid user clicking without loading file
 
     let uniqueId = null;
-    this.setState({loading: true});
+    this.setState({uploadingToIpfs: true});
     /* UPLOAD FILES TO IPFS NETWORK */
     const ipfsManager = new IpfsManager();
     ipfsManager.init( async () => {
       uniqueId = await ipfsManager.uploadFile(file);
+      this.setState({uploadingToIpfs: false, uploadingToBlockchain: true});
       if(uniqueId != null){
         /* UPLOAD DETAILS TO CHAIN */
         const contractsManager = new ContractsManager(web3);
         contractsManager.init( async () => {
         await contractsManager.addFile(uniqueId, file, currentFolder.id);
-        this.setState({loading: false, open: false});
+        this.setState({uploadingToBlockchain: false, open: false});
         this.state.updateFileViwer();
         });
       }
@@ -73,9 +76,22 @@ class AddFilePopup extends Component {
 		});
 	}
 
+  renderUploadingToIpfs = () => {
+    return (<div className="ui active inverted dimmer">
+      <div className="ui text loader">Uploading file to the IPFS network...</div>
+    </div>);
+  }
+
+  renderUploadingToBlockChain = () => {
+    return (<div className="ui active inverted dimmer">
+      <div className="ui text loader">Uploading file details to the Blockchain...</div>
+    </div>);
+  }
+
   render() {
+    const {open, uploadingToIpfs, uploadingToBlockchain} = this.state;
     return (
-      <Popup open={this.state.open} onClose={() => this.setState({open: undefined})} trigger={<button className="ui teal right labeled icon button"
+      <Popup open={open} onClose={() => this.setState({open: undefined})} trigger={<button className="ui teal right labeled icon button"
         style={{ borderRadius: "50px" }} >
         <i className="add icon" ></i>
           File
@@ -86,7 +102,9 @@ class AddFilePopup extends Component {
             Add File
           </h3>
           <div style={{textAlign: "center"}}>{this.renderPath()}</div>
-          <form className={this.state.loading ? "ui loading form" : "ui form"}>
+          <form className="ui form">
+            {uploadingToIpfs ? this.renderUploadingToIpfs() : ""}
+            {uploadingToBlockchain ? this.renderUploadingToBlockChain() : ""}
             <div className="form-group inputDnD">
               <input type="file" className="form-control-file text-danger font-weight-bold" id="inputFile" data-title="Click here to select a file or Drag and Drop it."
               onChange={this.fileInputOnChangeHandler} />

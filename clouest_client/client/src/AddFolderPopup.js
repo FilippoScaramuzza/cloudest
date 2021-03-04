@@ -70,7 +70,7 @@ class AddFolderPopup extends Component {
           <div style={{textAlign: "center"}}>{this.renderPath()}</div>
           <br/>
           <form className={this.state.loading ? "ui loading form" : "ui form"}>
-            <div className="ui action input" style={{width: "100%"}}>
+            <div className="ui action input">
               <input type="text" value={this.state.newName} onChange={this.fileInputOnChangeHandler} />
               <button className="ui teal right labeled icon button" onClick={this.createFolder}>
                 <i className="folder icon"></i>

@@ -106,6 +106,22 @@ class FileViewer extends Component {
 
 	}
 
+	moveToTrash = (file) => {
+		const { web3, filesDetails } = this.state;
+
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.moveToTrash(file.uniqueId, file.name);
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
 	deleteFile = (file) => {
 		const { web3, filesDetails } = this.state;
 
@@ -216,9 +232,13 @@ class FileViewer extends Component {
 									{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
 								</div>
 								<Dropdown.Divider />
-								<div className="item" onClick={() => { this.deleteFile(fd) }}>
+								<div className="item" onClick={ () => { this.deleteFile(fd) }}>
 									<i className="red trash icon"></i>
         							Delete
+        						</div>
+								<div className="item" onClick={ () => { this.moveToTrash(fd) }}>
+									<i className="red trash icon"></i>
+        							move to trash bin
         						</div>
 							</Dropdown.Menu>
 						</Dropdown>
@@ -275,6 +295,9 @@ class FileViewer extends Component {
 
 				filesDetailsFiltered = filesDetails.filter(fd => fd.transactionDate === date && fd.fileType !== "folder");
 				break;
+			case "trash":
+				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolder === "trash");
+				break;
 			default:
 				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolderId === currentFolder.id);
 				break;
@@ -301,11 +324,11 @@ class FileViewer extends Component {
 	}
 
 	render() {
-		const { currentFolder } = this.state;
-		if(currentFolder.id === "/") return (
+		const { currentFolder, currentPage } = this.state;
+		if(currentFolder.id === "/" || currentPage !== "files") return (
 			<>
 			<span> 
-				{this.renderPath()}
+				{currentPage === "files" ? this.renderPath() : ""}
 			</span>
 			<br/><br/>
 			<div className="ui eight doubling cards">

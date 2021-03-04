@@ -18,12 +18,12 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    currentFolder: {id: "/", name: "root", parentFolderId: "/"},
+    currentFolder: { id: "/", name: "root", parentFolderId: "/" },
     path: [{
-			id: "/",
-			name: "root",
-			parentFolderId: "/"
-		}],
+      id: "/",
+      name: "root",
+      parentFolderId: "/"
+    }],
     fileViewer: React.createRef()
   }
 
@@ -52,12 +52,28 @@ class App extends Component {
   }
 
   updateCurrentFolder = (currentFolder, path) => {
-    this.setState({currentFolder});
-    this.setState({path});
+    this.setState({ currentFolder });
+    this.setState({ path });
   }
 
   updateFileViwer = () => {
     this.state.fileViewer.current.retrieveFiles();
+  }
+
+  renderPageTitle = () => {
+    const { currentPage } = this.state;
+    switch (currentPage) {
+      case "files":
+        return <span>Files and Folders</span>;
+      case "recent":
+        return <span>Recent Files</span>;
+      case "favorites":
+        return <span>Favorites Files</span>;
+      case "trash":
+        return <span>Trash Bin</span>;
+      default:
+        return <span>Come hai fatto?</span>;
+    }
   }
 
   render() {
@@ -85,39 +101,46 @@ class App extends Component {
           <img className="main-logo-img" alt="Cloudest" src={logo} />
 
           <br /><br />
-          <AddFilePopup web3={web3} currentFolder={currentFolder} path={path} updateFileViwer={this.updateFileViwer}/>
-          <AddFolderPopup web3={web3} currentFolder={currentFolder}  path={path} updateFileViwer={this.updateFileViwer}/>
+          <AddFilePopup web3={web3} currentFolder={currentFolder} path={path} updateFileViwer={this.updateFileViwer} />
+          <AddFolderPopup web3={web3} currentFolder={currentFolder} path={path} updateFileViwer={this.updateFileViwer} />
           <br /><br /><br />
           <button className="ui teal right labeled icon button"
-                  style={{ width: "70%" }}
-                  onClick={() => this.changeCurrentPage("files")}>
-                  <i className="folder outline icon"></i>
+            style={{ width: "70%" }}
+            onClick={() => this.changeCurrentPage("files")}>
+            <i className="folder outline icon"></i>
             Files and Folders
           </button>
 
-                <br /><br />
-                <button className="ui teal right labeled icon button"
-                  style={{ width: "70%" }}
-                  onClick={() => this.changeCurrentPage("recent")}>
-                  <i className="clock outline icon"></i>
+          <br /><br />
+          <button className="ui teal right labeled icon button"
+            style={{ width: "70%" }}
+            onClick={() => this.changeCurrentPage("recent")}>
+            <i className="clock outline icon"></i>
             Recent Files
           </button>
 
-                <br /><br />
-                <button className="ui teal right labeled icon button"
-                  style={{ width: "70%" }}
-                  onClick={() => this.changeCurrentPage("favorites")}>
-                  <i className="star outline icon"></i>
+          <br /><br />
+          <button className="ui teal right labeled icon button"
+            style={{ width: "70%" }}
+            onClick={() => this.changeCurrentPage("favorites")}>
+            <i className="star outline icon"></i>
             Favorites Files
+          </button>
+
+          <br /><br /><br /><br />
+          <button className="ui teal right labeled icon button"
+            style={{ width: "50%", marginBottom: "20px" }}
+            onClick={() => this.changeCurrentPage("trash")}>
+            <i className="trash alternate outline icon"></i>
+            Trash Bin
           </button>
 
         </div>
         <div className="mainpage">
           <h1 className="ui horizontal divider header">
-            <i className="teal folder icon"></i>
-            {currentPage}
+            {this.renderPageTitle()}
           </h1>
-          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer}/>
+          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
         </div>
       </div>
     );
