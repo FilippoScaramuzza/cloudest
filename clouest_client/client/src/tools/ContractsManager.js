@@ -15,7 +15,7 @@ class ContractsManager extends Component{
 		const { web3 } = this;
 		// Use web3 to get the user's accounts.
 		const accounts = await web3.eth.getAccounts();
-
+		
 		// Get the contract instance.
 		const networkId = await web3.eth.net.getId();
 		const deployedNetwork = FileDetailsManager.networks[networkId];
@@ -93,15 +93,6 @@ class ContractsManager extends Component{
 
 		try {
 			await contract.methods.setFavorite(uniqueId, name, isFavorite).send({ from: accounts[0] });
-		} catch (error) {
-			console.log(error);
-		}
-	}
-	moveToTrash = async (uniqueId, name) => {
-		const { accounts, contract } = this;
-
-		try {
-			await contract.methods.moveToTrash(uniqueId, name).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}

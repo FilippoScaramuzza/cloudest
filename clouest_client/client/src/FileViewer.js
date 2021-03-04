@@ -35,7 +35,6 @@ class FileViewer extends Component {
 
 	retrieveFiles = () => {
 		const { web3 } = this.state;
-
 		const contractsManager = new ContractsManager(web3);
 		contractsManager.init(async () => {
 			await contractsManager.getFilesDetails().then((res) => {
@@ -75,7 +74,7 @@ class FileViewer extends Component {
 	}
 
 	downloadFile = (file) => {
-		let { filesDetails } = this.state;
+		let { filesDetails, web3 } = this.state;
 		const ipfsManager = new IpfsManager();
 
 		filesDetails.find(fd => fd.uniqueId === file.uniqueId).downloading = true;
@@ -83,7 +82,8 @@ class FileViewer extends Component {
 		this.setState({ filesDetails });
 
 		ipfsManager.init(async () => {
-			await ipfsManager.retrieveFile(file);
+			let walletAddress = await web3.eth.getAccounts();
+			await ipfsManager.retrieveFile(file, walletAddress[0]);
 			filesDetails.find(fd => fd.uniqueId === file.uniqueId).downloading = false;
 			this.setState({ filesDetails });
 		});
@@ -104,22 +104,6 @@ class FileViewer extends Component {
 			this.retrieveFiles();
 		});
 
-	}
-
-	moveToTrash = (file) => {
-		const { web3, filesDetails } = this.state;
-
-		filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = true;
-		this.setState({ filesDetails });
-
-		const contractsManager = new ContractsManager(web3);
-		contractsManager.init(async () => {
-			await contractsManager.moveToTrash(file.uniqueId, file.name);
-			filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = false;
-			this.setState({ filesDetails });
-
-			this.retrieveFiles();
-		});
 	}
 
 	deleteFile = (file) => {
@@ -235,10 +219,6 @@ class FileViewer extends Component {
 								<div className="item" onClick={ () => { this.deleteFile(fd) }}>
 									<i className="red trash icon"></i>
         							Delete
-        						</div>
-								<div className="item" onClick={ () => { this.moveToTrash(fd) }}>
-									<i className="red trash icon"></i>
-        							move to trash bin
         						</div>
 							</Dropdown.Menu>
 						</Dropdown>

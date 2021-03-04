@@ -51,7 +51,11 @@ class AddFilePopup extends Component {
     /* UPLOAD FILES TO IPFS NETWORK */
     const ipfsManager = new IpfsManager();
     ipfsManager.init( async () => {
-      uniqueId = await ipfsManager.uploadFile(file);
+
+      let walletAddress = await web3.eth.getAccounts();
+      console.log("AddFilePopup" + walletAddress[0]);
+      
+      uniqueId = await ipfsManager.uploadFile(file, walletAddress[0]);
       this.setState({uploadingToIpfs: false, uploadingToBlockchain: true});
       if(uniqueId != null){
         /* UPLOAD DETAILS TO CHAIN */

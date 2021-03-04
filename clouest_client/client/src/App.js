@@ -127,14 +127,6 @@ class App extends Component {
             Favorites Files
           </button>
 
-          <br /><br /><br /><br />
-          <button className="ui teal right labeled icon button"
-            style={{ width: "50%", marginBottom: "20px" }}
-            onClick={() => this.changeCurrentPage("trash")}>
-            <i className="trash alternate outline icon"></i>
-            Trash Bin
-          </button>
-
         </div>
         <div className="mainpage">
           <h1 className="ui horizontal divider header">
