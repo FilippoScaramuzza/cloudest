@@ -24,7 +24,8 @@ class App extends Component {
       name: "root",
       parentFolderId: "/"
     }],
-    fileViewer: React.createRef()
+    fileViewer: React.createRef(),
+    searchValue: null
   }
 
   componentDidMount = async () => {
@@ -60,8 +61,12 @@ class App extends Component {
     this.state.fileViewer.current.retrieveFiles();
   }
 
+  searchValueOnChangeHandler = (e) => {
+    this.setState({searchValue: e.target.value});
+  }
+
   renderPageTitle = () => {
-    const { currentPage } = this.state;
+    const { currentPage, searchValue } = this.state;
     switch (currentPage) {
       case "files":
         return <span>Files and Folders</span>;
@@ -71,13 +76,15 @@ class App extends Component {
         return <span>Favorites Files</span>;
       case "trash":
         return <span>Trash Bin</span>;
+      case "search":
+        return <span>Search Results of "{searchValue}"</span>;
       default:
         return <span>Come hai fatto?</span>;
     }
   }
 
   render() {
-    const { currentPage, currentFolder, path, web3 } = this.state;
+    const { currentPage, currentFolder, path, web3, searchValue } = this.state;
 
     if (!web3) {
       return (
@@ -127,12 +134,26 @@ class App extends Component {
             Favorites Files
           </button>
 
+          <br /><br />
+          <div class="ui icon input" style={{ width: "70%" }} onClick={() => this.changeCurrentPage("search")}>
+            <input type="text" placeholder="Search..." onChange={this.searchValueOnChangeHandler}/>
+            <i class="teal inverted circular search link icon" ></i>
+          </div>
+
+          <br /><br /><br /><br />
+          <button className="ui teal right labeled icon button"
+            style={{ width: "50%", marginBottom: "20px" }}
+            onClick={() => this.changeCurrentPage("trash")}>
+            <i className="trash alternate outline icon"></i>
+            Trash Bin
+          </button>
+
         </div>
         <div className="mainpage">
           <h1 className="ui horizontal divider header">
             {this.renderPageTitle()}
           </h1>
-          <FileViewer web3={web3} currentPage={currentPage} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
+          <FileViewer web3={web3} currentPage={currentPage} searchValue={searchValue} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
         </div>
       </div>
     );

@@ -10,6 +10,7 @@ class FileViewer extends Component {
 		currentPage: this.props.currentPage,
 		filesDetails: null,
 		updateCurrentFolder: this.props.updateCurrentFolder,
+		searchValue: this.props.searchValue,
 		currentFolder: {
 			id: "/",
 			name: "root",
@@ -19,7 +20,17 @@ class FileViewer extends Component {
 			id: "/",
 			name: "root",
 			parentFolderId: "/"
-		}]
+		}],
+		currentFolderTrash: {
+			id: "/",
+			name: "trash",
+			parentFolderId: "/"
+		},
+		pathTrash: [{
+			id: "/",
+			name: "trash",
+			parentFolderId: "/"
+		}],
 	}
 
 	componentDidMount = async () => {
@@ -28,7 +39,15 @@ class FileViewer extends Component {
 
 	componentDidUpdate(prevProps) {
 		if (this.props.currentPage !== prevProps.currentPage) {
-			this.setState({ currentPage: this.props.currentPage });
+			this.setState({ currentPage: this.props.currentPage, 
+							currentFolder: {id: "/", name: "root", parentFolderId: "/"},
+							path: [{ id: "/", name: "root", parentFolderId: "/"}],
+							currentFolderTrash: {id: "/", name: "trash", parentFolderId: "/"},
+							pathTrash: [{ id: "/", name: "trash", parentFolderId: "/" }]});
+			this.render();
+		}
+		if (this.props.searchValue !== prevProps.searchValue) {
+			this.setState({ searchValue: this.props.searchValue});
 			this.render();
 		}
 	}
@@ -42,6 +61,7 @@ class FileViewer extends Component {
 					fd["downloading"] = false;
 					fd["favoriting"] = false; // "favoriting" is not a real word
 					fd["deleting"] = false;
+					fd["restoring"] = false;
 				});
 
 				res.forEach(function(fd,i){
@@ -50,6 +70,8 @@ class FileViewer extends Component {
 					  res.unshift(fd);
 					}
 				});
+
+				console.log(res);
 
 				this.setState({ filesDetails: res });
 			});
@@ -138,23 +160,105 @@ class FileViewer extends Component {
 		});
 	}
 
+	moveToTrashFile = (file) => {
+		const { web3, filesDetails } = this.state;
+
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.setTrashFile(file.uniqueId, file.name, true);
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).deleting = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
+	moveToTrashFolder = (folder) => {
+		const { web3, filesDetails } = this.state;
+	
+		filesDetails.find(fd => fd.uniqueId === folder.uniqueId).deleting = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.setTrashFolder(folder.uniqueId, true);
+			filesDetails.find(fd => fd.uniqueId === folder.uniqueId).deleting = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
+	restoreFile = (file) => {
+		const { web3, filesDetails } = this.state;
+
+		filesDetails.find(fd => fd.uniqueId === file.uniqueId).restoring = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.setTrashFile(file.uniqueId, file.name, false);
+			filesDetails.find(fd => fd.uniqueId === file.uniqueId).restoring = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
+	restoreFolder = (folder) => {
+		const { web3, filesDetails } = this.state;
+	
+		filesDetails.find(fd => fd.uniqueId === folder.uniqueId).restoring = true;
+		this.setState({ filesDetails });
+
+		const contractsManager = new ContractsManager(web3);
+		contractsManager.init(async () => {
+			await contractsManager.setTrashFolder(folder.uniqueId, false);
+			filesDetails.find(fd => fd.uniqueId === folder.uniqueId).restoring = false;
+			this.setState({ filesDetails });
+
+			this.retrieveFiles();
+		});
+	}
+
 	changeCurrentFolder = async (uniqueId, name, parentFolderId) => {
-		let { updateCurrentFolder,  path} = this.state;
-		await this.setState({ currentFolder: { id: uniqueId, name: name, parentFolderId: parentFolderId} })
+		let { currentPage, updateCurrentFolder,  path, pathTrash} = this.state;
+		if(currentPage === "files") {
+			await this.setState({ currentFolder: { id: uniqueId, name: name, parentFolderId: parentFolderId} })
 
-		let found = false;
-		for(let i = 0; i < path.length; i++){
-			if(path[i].id === uniqueId) {
-				path.length = i + 1;
-				found = true;
+			let found = false;
+			for(let i = 0; i < path.length; i++){
+				if(path[i].id === uniqueId) {
+					path.length = i + 1;
+					found = true;
+				}
 			}
-		}
-		if(!found) {
-			path.push(this.state.currentFolder)
-		}
+			if(!found) {
+				path.push(this.state.currentFolder)
+			}
 
-		await this.setState({ path })
-		updateCurrentFolder(this.state.currentFolder, path);
+			await this.setState({ path })
+			updateCurrentFolder(this.state.currentFolder, path);
+		}
+		else if(currentPage === "trash") {
+			await this.setState({ currentFolderTrash: { id: uniqueId, name: name, parentFolderId: parentFolderId} })
+
+			let found = false;
+			for(let i = 0; i < pathTrash.length; i++){
+				if(pathTrash[i].id === uniqueId) {
+					pathTrash.length = i + 1;
+					found = true;
+				}
+			}
+			if(!found) {
+				pathTrash.push(this.state.currentFolderTrash)
+			}
+
+			await this.setState({ pathTrash })
+		}
 	}
 
 	goToParentFolder = async () => {
@@ -187,13 +291,22 @@ class FileViewer extends Component {
 			</div>);
 	}
 
+	renderRestoring = () => {
+		return (
+			<div className="ui active inverted dimmer">
+				<div className="ui text loader">Restoring...</div>
+			</div>);
+	}
+
 	renderFile = (fd, index) => {
-		const { fileType, uniqueId, name, isFavorite, downloading, favoriting, deleting } = fd;
+		const { currentPage } = this.state;
+		const { fileType, uniqueId, name, isFavorite, downloading, favoriting, deleting, restoring } = fd;
 		return (
 			<div className="ui teal card" key={index}>
 					{downloading ? this.renderDownloading() : ""}
 					{favoriting ? this.renderFavoriting() : ""}
 					{deleting ? this.renderDeleting() : ""}
+					{restoring ? this.renderRestoring() : ""}
 					<div className="content">
 						<i className={this.getIconFromExtension(fileType)} style={{ fontSize: "30px" }}></i>
 						<br /><br />
@@ -206,19 +319,26 @@ class FileViewer extends Component {
 						</span>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
+								{currentPage !== "trash" ? <>
 								<div className="item" onClick={() => { this.downloadFile(fd) }}>
 									<i className="download icon"></i>
         							Download
         						</div>
-								<RenameFilePopup uniqueId={uniqueId} name={name} web3={this.state.web3} />
+								<RenameFilePopup retrieveFiles={this.retrieveFiles} uniqueId={uniqueId} name={name} web3={this.state.web3} />
 								<div className="item" onClick={() => { this.setFavorite(fd) }}>
 									<i className={isFavorite ? 'yellow star icon' : 'yellow outline star icon'}></i>
 									{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+								</div></>:
+								<div className="item" onClick={() => { this.restoreFile(fd) }}>
+									<i className="folder icon"></i>
+									Restore File
 								</div>
+								}
 								<Dropdown.Divider />
-								<div className="item" onClick={ () => { this.deleteFile(fd) }}>
+								<div className="item" onClick={currentPage === "trash" ? () => this.deleteFile(fd) : () => this.moveToTrashFile(fd)}>
 									<i className="red trash icon"></i>
-        							Delete
+									{console.log(currentPage)}
+        							{currentPage === "trash" ? 'Delete Permanently' : 'Move to Trash'}
         						</div>
 							</Dropdown.Menu>
 						</Dropdown>
@@ -228,10 +348,12 @@ class FileViewer extends Component {
 	}
 
 	renderFolder = (fd, index) => {
-		const { fileType, uniqueId, name, parentFolderId, deleting } = fd;
+		const { currentPage } = this.state;
+		const { fileType, uniqueId, name, parentFolderId, deleting, restoring } = fd;
 		return (
 			<div className="ui teal card" key={index} onClick={() => { this.changeCurrentFolder(uniqueId, name, parentFolderId) }}>
 					{deleting ? this.renderDeleting() : ""}
+					{restoring ? this.renderRestoring() : ""}
 					<div className="content" style={{ backgroundColor: "#00ACA3", color: "white" }}>
 						<i className={this.getIconFromExtension(fileType)} style={{ fontSize: "30px" }}></i>
 						<br /><br />
@@ -243,11 +365,16 @@ class FileViewer extends Component {
 						</span>
 						<Dropdown text='Actions'>
 							<Dropdown.Menu>
-								<RenameFilePopup uniqueId={uniqueId} name={name} web3={this.state.web3} />
+								{currentPage !== "trash" ? <>
+								<RenameFilePopup retrieveFiles={this.retrieveFiles} uniqueId={uniqueId} name={name} web3={this.state.web3} /></> : 
+								<div className="item" onClick={() => { this.restoreFolder(fd) }}>
+									<i className="folder icon"></i>
+									Restore Folder
+								</div>}
 								<Dropdown.Divider />
-								<div className="item" onClick={() => { this.deleteFolder(fd) }}>
+								<div className="item" onClick={currentPage === "trash" ? () => this.deleteFolder(fd) : () => this.moveToTrashFolder(fd)}>
 									<i className="red trash icon"></i>
-        							Delete
+        							{currentPage === "trash" ? 'Delete Permanently' : 'Move to Trash'}
         						</div>
 							</Dropdown.Menu>
 						</Dropdown>
@@ -257,13 +384,13 @@ class FileViewer extends Component {
 	}
 
 	renderFilesDetails = () => {
-		const { filesDetails, currentPage, currentFolder } = this.state;
+		const { filesDetails, currentPage, currentFolder, currentFolderTrash, searchValue } = this.state;
 		if (filesDetails == null) return null;
 		let filesDetailsFiltered = null;
 		
 		switch (currentPage) {
 			case "favorites":
-				filesDetailsFiltered = filesDetails.filter(fd => fd.isFavorite === true && fd.fileType !== "folder");
+				filesDetailsFiltered = filesDetails.filter(fd => fd.isFavorite === true && fd.fileType !== "folder" && !fd.isTrash);
 				break;
 			case "recent":
 
@@ -273,13 +400,21 @@ class FileViewer extends Component {
 				let yyyy = date.getFullYear();
 				date = mm + '/' + dd + '/' + yyyy;
 
-				filesDetailsFiltered = filesDetails.filter(fd => fd.transactionDate === date && fd.fileType !== "folder");
+				filesDetailsFiltered = filesDetails.filter(fd => fd.transactionDate === date && fd.fileType !== "folder" && !fd.isTrash);
 				break;
 			case "trash":
-				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolder === "trash");
+				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolderId === currentFolderTrash.id && fd.isTrash);
+				break;
+			case "search":
+				if(searchValue === "") {
+					filesDetailsFiltered = [];
+				}
+				else {
+					filesDetailsFiltered = filesDetails.filter(fd => fd.name.includes(searchValue) && fd.fileType !== "folder" && !fd.isTrash);
+				}
 				break;
 			default:
-				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolderId === currentFolder.id);
+				filesDetailsFiltered = filesDetails.filter(fd => fd.parentFolderId === currentFolder.id && !fd.isTrash);
 				break;
 		}
 
@@ -294,21 +429,31 @@ class FileViewer extends Component {
 	}
 
 	renderPath = () => {
-		const { path } = this.state;
-		return path.map((folder, index) => {
-			return (<><div className="ui icon label" key={index} style={{cursor: "pointer"}} onClick={() => this.changeCurrentFolder(folder.id, folder.name, folder.parentFolderId)}>
-						<i className="folder icon"/>
-						{folder.name}
-		  			</div>{index!==path.length-1 ? ">" : ""}</>);
-		});
+		const { currentPage, path, pathTrash } = this.state;
+		if(currentPage === "files") {
+			return path.map((folder, index) => {
+				return (<><div className="ui icon label" key={index} style={{cursor: "pointer"}} onClick={() => this.changeCurrentFolder(folder.id, folder.name, folder.parentFolderId)}>
+							<i className="folder icon"/>
+							{folder.name}
+						  </div>{index!==path.length-1 ? ">" : ""}</>);
+			});
+		}
+		if(currentPage === "trash") {
+			return pathTrash.map((folder, index) => {
+				return (<><div className="ui icon label" key={index} style={{cursor: "pointer"}} onClick={() => this.changeCurrentFolder(folder.id, folder.name, folder.parentFolderId)}>
+							<i className="folder icon"/>
+							{folder.name}
+						  </div>{index!==pathTrash.length-1 ? ">" : ""}</>);
+			});
+		}
 	}
 
 	render() {
-		const { currentFolder, currentPage } = this.state;
-		if(currentFolder.id === "/" || currentPage !== "files") return (
+		const { currentFolder, currentFolderTrash, currentPage } = this.state;
+		if(currentFolder.id === "/" || currentFolderTrash.id === "/" || (currentPage !== "files" && currentPage !== "trash")) return (
 			<>
 			<span> 
-				{currentPage === "files" ? this.renderPath() : ""}
+				{currentPage === "files" || currentPage === "trash" ? this.renderPath() : ""}
 			</span>
 			<br/><br/>
 			<div className="ui eight doubling cards">

@@ -37,7 +37,7 @@ class AddFilePopup extends Component {
   fileInputOnChangeHandler = (e) => {
     //console.log(e.target.files[0]);
     e.target.setAttribute("data-title", e.target.files[0].name + "\n(" + this.humanFileSize(e.target.files[0].size) + ")");
-    this.setState({file: e.target.files[0]})
+    this.setState({file: e.target.files[0]});
   }
 
   uploadFile = async (e) => {

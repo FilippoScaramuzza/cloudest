@@ -5,10 +5,11 @@ import ContractsManager from './tools/ContractsManager';
 
 class RenameFilePopup extends Component {
   state = {
-    name: this.props["name"],
-    newName: this.props["name"],
-    uniqueId: this.props["uniqueId"],
-    web3: this.props["web3"],
+    name: this.props.name,
+    newName: this.props.name,
+    uniqueId: this.props.uniqueId,
+    web3: this.props.web3,
+    retrieveFiles: this.props.retrieveFiles,
     loading: false
   }
 
@@ -25,14 +26,21 @@ class RenameFilePopup extends Component {
     const contractsManager = new ContractsManager(web3);
     contractsManager.init(async () => {
       await contractsManager.renameFile(uniqueId, name, newName);
-      this.setState({loading: false});
-      window.location.reload();
+      this.setState({loading: false, open: false});
+      this.state.retrieveFiles();
     });
   }
 
+  renderLoading = () => {
+    return (<div className="ui active inverted dimmer">
+      <div className="ui text loader">Renaming...</div>
+    </div>);
+  }
+
   render() {
+    const { open, loading } = this.state;
     return (
-      <Popup trigger={<div className="item">
+      <Popup open={open} onClose={() => this.setState({open: undefined})} trigger={<div className="item">
         <i className="i cursor icon"></i>
         Rename
         </div>} modal>
@@ -41,7 +49,8 @@ class RenameFilePopup extends Component {
             <i className="teal file icon"></i>
             Rename File
           </h3>
-          <form className={this.state.loading ? "ui loading form" : "ui form"}>
+          <form className={"ui form"}>
+            {loading ? this.renderLoading() : ""}
             <div className="ui action input">
               <input type="text" value={this.state.newName} onChange={this.fileInputOnChangeHandler} />
               <button className="ui teal right labeled icon button" onClick={this.renameFile}>
