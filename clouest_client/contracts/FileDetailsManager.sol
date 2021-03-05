@@ -19,6 +19,7 @@ contract FileDetailsManager {
         string fileType; // "folder" if folder, the extension of the file otherwise.
         string parentFolderId;
         bool isFavorite;
+        bool isTrash;
     }
 
     /*
@@ -37,7 +38,8 @@ contract FileDetailsManager {
                 fileType: fileType,
                 transactionDate: date,
                 parentFolderId: parentFolderId,
-                isFavorite: false
+                isFavorite: false,
+                isTrash: false
             }));
     }
 
@@ -52,7 +54,8 @@ contract FileDetailsManager {
                 fileType: "folder",
                 transactionDate: date,
                 parentFolderId: parentFolderId,
-                isFavorite: false
+                isFavorite: false,
+                isTrash: false
             }));
         folderId++;
     }
@@ -147,5 +150,44 @@ contract FileDetailsManager {
             i /= 10;
         }
         return string(bstr);
+    }
+
+    function setTrashFile(string memory uniqueId, string memory name, bool isTrash, bool isSingleDelete) public {
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        uint index = 0;
+        for(uint i = 0; i < filesDetails.length; i++){
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) 
+            && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) {
+                filesDetails[i].isTrash = isTrash;
+                if(isSingleDelete) {
+                    filesDetails[i].parentFolderId = "/";
+                }
+            }
+        }
+    }
+
+    function setTrashFolder(string memory uniqueId, bool isTrash, bool isSingleDelete) public {
+        FileDetails[] storage filesDetails = filesList[msg.sender];
+        uint index = 0;
+        for(uint i = 0; i < filesDetails.length; i++){
+
+            if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId))){
+                filesDetails[i].isTrash = isTrash;
+                if(isSingleDelete) {
+                    filesDetails[i].parentFolderId = "/";
+                }
+                for(uint j = 0; j < filesDetails.length; j++){
+                    
+                    if( keccak256(bytes(filesDetails[j].parentFolderId)) == keccak256(bytes(filesDetails[i].uniqueId)) ){
+                        if( keccak256(bytes(filesDetails[j].fileType)) == keccak256(bytes("folder")) ){
+                            setTrashFolder(filesDetails[j].uniqueId, isTrash, false);
+                        }   
+                        if( keccak256(bytes(filesDetails[j].fileType)) != keccak256(bytes("folder")) ){
+                            setTrashFile(filesDetails[j].uniqueId, filesDetails[j].name, isTrash, false);
+                        }
+                    }
+                } 
+            }
+        }      
     }
 }
