@@ -62,7 +62,7 @@ class App extends Component {
   }
 
   searchValueOnChangeHandler = (e) => {
-    this.setState({searchValue: e.target.value});
+    this.setState({ searchValue: e.target.value });
   }
 
   renderPageTitle = () => {
@@ -136,7 +136,7 @@ class App extends Component {
 
           <br /><br />
           <div class="ui icon input" style={{ width: "70%" }} onClick={() => this.changeCurrentPage("search")}>
-            <input type="text" placeholder="Search..." onChange={this.searchValueOnChangeHandler}/>
+            <input type="text" placeholder="Search..." onChange={this.searchValueOnChangeHandler} />
             <i class="teal inverted circular search link icon" ></i>
           </div>
 
@@ -148,14 +148,16 @@ class App extends Component {
             Trash Bin
           </button>
 
+          </div>
+
+          <div className="mainpage">
+            <h1 className="ui horizontal divider header">
+              {this.renderPageTitle()}
+            </h1>
+            <FileViewer web3={web3} currentPage={currentPage} searchValue={searchValue} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
+          </div>
         </div>
-        <div className="mainpage">
-          <h1 className="ui horizontal divider header">
-            {this.renderPageTitle()}
-          </h1>
-          <FileViewer web3={web3} currentPage={currentPage} searchValue={searchValue} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
-        </div>
-      </div>
+
     );
   }
 }

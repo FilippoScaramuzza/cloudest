@@ -35,7 +35,6 @@ class AddFilePopup extends Component {
 	}
 
   fileInputOnChangeHandler = (e) => {
-    //console.log(e.target.files[0]);
     e.target.setAttribute("data-title", e.target.files[0].name + "\n(" + this.humanFileSize(e.target.files[0].size) + ")");
     this.setState({file: e.target.files[0]});
   }
@@ -53,7 +52,6 @@ class AddFilePopup extends Component {
     ipfsManager.init( async () => {
 
       let walletAddress = await web3.eth.getAccounts();
-      console.log("AddFilePopup" + walletAddress[0]);
       
       uniqueId = await ipfsManager.uploadFile(file, walletAddress[0]);
       this.setState({uploadingToIpfs: false, uploadingToBlockchain: true});

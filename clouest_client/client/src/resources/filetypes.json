@@ -1,0 +1,34 @@
+{
+    "filetypes": [
+        {
+            "fileExtension": "folder",
+            "icon": "folder inverted icon",
+            "text": "Folder"
+        },
+        {
+            "fileExtension": "application/pdf",
+            "icon": "file pdf outline icon",
+            "text": "PDF"
+        },
+        {
+            "fileExtension": "image/png",
+            "icon": "file image outline icon",
+            "text": "PNG"
+        },
+        {
+            "fileExtension": "application/jpg",
+            "icon": "file image outline icon",
+            "text": "JPG"
+        },
+        {
+            "fileExtension": "image/jpeg",
+            "icon": "file image outline icon",
+            "text": "JPG"
+        },
+        {
+            "fileExtension": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "icon": "file word outline icon",
+            "text": "Word"
+        }
+    ] 
+}

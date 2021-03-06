@@ -120,7 +120,6 @@ class ContractsManager extends Component{
 
 	setTrashFile = async (uniqueId, name, isTrash) => {
 		const { accounts, contract } = this;
-		console.log(uniqueId, name, isTrash);
 		try {
 			await contract.methods.setTrashFile(uniqueId, name, isTrash, true).send({ from: accounts[0] });
 		} catch (error) {
@@ -130,7 +129,6 @@ class ContractsManager extends Component{
 
 	setTrashFolder = async (uniqueId, isTrash) => {
 		const { accounts, contract } = this;
-		console.log(uniqueId, isTrash);
 		try {
 			await contract.methods.setTrashFolder(uniqueId, isTrash, true).send({ from: accounts[0] });
 		} catch (error) {

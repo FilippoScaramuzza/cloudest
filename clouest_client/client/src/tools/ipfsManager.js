@@ -35,7 +35,6 @@ class IpfsManager {
 			responseType: "arraybuffer",
 		}).then(res => {
 			const encryptionManager = new EncryptionManager();
-			console.log(key);
 			let buffer = encryptionManager.decrypt(Buffer.from(res.data), key);
 			fileDownload(buffer, file.name);
 		});
