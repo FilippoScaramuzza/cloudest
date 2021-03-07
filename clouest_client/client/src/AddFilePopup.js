@@ -13,13 +13,9 @@ class AddFilePopup extends Component {
     loading: false,
     updateFileViwer: this.props.updateFileViwer,
     uploadingToIpfs: false,
-    uploadingToBlockchain: false
+    uploadingToBlockchain: false,
+    error: ""
   }
-
-  humanFileSize = (size) => {
-    var i = size === 0 ? 0 : Math.floor( Math.log(size) / Math.log(1024) );
-    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-  };
 
   async componentDidUpdate(prevProps) {
 		if (this.props.currentFolder !== prevProps.currentFolder)
@@ -34,9 +30,20 @@ class AddFilePopup extends Component {
     }
 	}
 
+  humanFileSize = (size) => {
+    var i = size === 0 ? 0 : Math.floor( Math.log(size) / Math.log(1024) );
+    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+  };
+
   fileInputOnChangeHandler = (e) => {
-    e.target.setAttribute("data-title", e.target.files[0].name + "\n(" + this.humanFileSize(e.target.files[0].size) + ")");
-    this.setState({file: e.target.files[0]});
+    if (e.target.files[0].size < 100000000) {
+      e.target.setAttribute("data-title", e.target.files[0].name.replace(/(.{50})..+/, "$1...") + "\n(" + this.humanFileSize(e.target.files[0].size) + ")");
+      this.setState({file: e.target.files[0]});
+      this.setState({error: ""});
+    }
+    else {
+      this.setState({error: "You cannot upload files larger than 100 MB."});
+    }
   }
 
   uploadFile = async (e) => {
@@ -72,9 +79,9 @@ class AddFilePopup extends Component {
 		const { path } = this.state;
 		return path.map((folder, index) => {
 			return (<><div class="ui icon label" key={index} style={{marginBottom: "5px"}}>
-						<i className="folder icon" />
-						{folder.name}
-		  			</div>{index!==path.length-1 ? ">" : ""}</>);
+				<i className="folder icon" />
+				{folder.name}
+		  	</div>{index!==path.length-1 ? ">" : ""}</>);
 		});
 	}
 
@@ -91,7 +98,7 @@ class AddFilePopup extends Component {
   }
 
   render() {
-    const {open, uploadingToIpfs, uploadingToBlockchain} = this.state;
+    const {open, uploadingToIpfs, uploadingToBlockchain, error} = this.state;
     return (
       <Popup open={open} onClose={() => this.setState({open: undefined})} trigger={<button className="ui teal right labeled icon button"
         style={{ borderRadius: "50px" }} >
@@ -108,10 +115,12 @@ class AddFilePopup extends Component {
             {uploadingToIpfs ? this.renderUploadingToIpfs() : ""}
             {uploadingToBlockchain ? this.renderUploadingToBlockChain() : ""}
             <div className="form-group inputDnD">
-              <input type="file" className="form-control-file text-danger font-weight-bold" id="inputFile" data-title="Click here to select a file or Drag and Drop it."
+              <input type="file" className="form-control-file text-danger font-weight-bold" id="inputFile" data-title="Click here to select a file or Drag and Drop it." style={{textOverflow: "ellipsis"}}
               onChange={this.fileInputOnChangeHandler} />
             </div>
-            <br/><br />
+            <br/><div style={{color: "red", textAlign: "center"}}>
+                {error}
+              </div><br />
             <button className="ui teal right labeled icon button" style={{ margin: "auto", display: "block" }} onClick={this.uploadFile}>
               <i className="upload icon"></i>
               Upload File

@@ -416,7 +416,7 @@ class FileViewer extends Component {
 
 				let date = new Date();
 				let dd = String(date.getDate()).padStart(2, '0');
-				let mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+				let mm = String(date.getMonth() + 1).padStart(2, '0');
 				let yyyy = date.getFullYear();
 				date = mm + '/' + dd + '/' + yyyy;
 
@@ -481,7 +481,7 @@ class FileViewer extends Component {
 						if(fileType)
 							return (
 							<div className="item" key={index} onClick={() => this.setState({currentFileFilter: f})}>
-								<span><i className={fileType.icon} style={{fontSize: "20px"}}></i>
+								<span><i className={fileType.icon} style={{fontSize: "15px"}}></i>
 								{fileType.text}</span>
 							</div>
 							);
@@ -489,7 +489,7 @@ class FileViewer extends Component {
 					})}
 					<Dropdown.Divider />
 					<div className="item" onClick={() => this.setState({currentFileFilter: ""})}>
-						<i className="file outline icon" style={{fontSize: "20px"}}></i>
+						<i className="file outline icon" style={{fontSize: "15px"}}></i>
 							All Files
 					</div>
 				</Dropdown.Menu>
@@ -517,15 +517,20 @@ class FileViewer extends Component {
 				break;
 			case "Datedown":
 				filesDetails.sort(function (a, b) {
-					if (a.transactionDate < b.transactionDate) { return -1; }
-					if (a.transactionDate > b.transactionDate) { return 1; }
+					let dateA = new Date(a.transactionDate);
+					let dateB = new Date(b.transactionDate);
+					if (dateA < dateB) { return -1; }
+					if (dateA > dateB) { return 1; }
 					return 0;
 				});
 				break;
 			case "Dateup":
 				filesDetails.sort(function (a, b) {
-					if (a.transactionDate > b.transactionDate) { return -1; }
-					if (a.transactionDate < b.transactionDate) { return 1; }
+					let dateA = new Date(a.transactionDate);
+					let dateB = new Date(b.transactionDate);
+					console.log(dateA + dateB);
+					if (dateA > dateB) { return -1; }
+					if (dateA < dateB) { return 1; }
 					return 0;
 				});
 				break;
@@ -550,11 +555,11 @@ class FileViewer extends Component {
 						</div>
 					<div className="item" onClick={() => { this.orderBy("Datedown") }} >
 						<i className="sort amount down icon"></i>
-							Date su
+							Date Asc.
 						</div>
 					<div className="item" onClick={() => { this.orderBy("Dateup") }} >
 						<i className="sort amount up icon"></i>
-							Date giu
+							Date Desc.
 						</div>
 				</Dropdown.Menu>
 			</Dropdown>

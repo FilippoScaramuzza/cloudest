@@ -26,9 +26,49 @@
             "text": "JPG"
         },
         {
+            "fileExtension": "image/gif",
+            "icon": "file image outline icon",
+            "text": "GIF"
+        },
+        {
             "fileExtension": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "icon": "file word outline icon",
             "text": "Word"
+        },
+        {
+            "fileExtension": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "icon": "file powerpoint outline icon",
+            "text": "Powerpoint"
+        },
+        {
+            "fileExtension": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "icon": "file excel outline icon",
+            "text": "Powerpoint"
+        },
+        {
+            "fileExtension": "java",
+            "icon": "code icon",
+            "text": "Java"
+        },
+        {
+            "fileExtension": "cs",
+            "icon": "code icon",
+            "text": "C#"
+        },
+        {
+            "fileExtension": "text/javascript",
+            "icon": "js square icon",
+            "text": "Javascript"
+        },
+        {
+            "fileExtension": "text/css",
+            "icon": "css3 alternate icon",
+            "text": "CSS"
+        },
+        {
+            "fileExtension": "text/html",
+            "icon": "html5 icon",
+            "text": "HTML"
         }
     ] 
 }

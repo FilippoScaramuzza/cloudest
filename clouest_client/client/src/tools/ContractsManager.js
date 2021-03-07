@@ -39,13 +39,34 @@ class ContractsManager extends Component{
 
 		let date = new Date();
 		let dd = String(date.getDate()).padStart(2, '0');
-		let mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+		let MM = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
 		let yyyy = date.getFullYear();
 
-		date = mm + '/' + dd + '/' + yyyy;
+		let hh = String(date.getHours());
+		let mm = String(date.getMinutes());
+		let ss = String(date.getSeconds());
+
+		date = MM + '/' + dd + '/' + yyyy + " " + hh + ":" + mm + ":" + ss;
+		console.log(date);
+		const filesDetails = await this.getFilesDetails();
+
+		let fileName = file.name;
+		filesDetails.forEach(fd => {
+			if(fd.name === fileName) {
+				let splittedString = fileName.split('.');
+				splittedString[splittedString.length - 2] = splittedString[splittedString.length - 2].concat(" (1)");
+				fileName = splittedString.join(".");
+			}
+		});
+
+		let fileType = file.type;
+		if(fileType === "") {
+			let splittedString = fileName.split('.');
+			fileType = splittedString[splittedString.length - 1];
+		}
 
 		try {
-			await contract.methods.addFile(ipfsuniqueId, file.name, file.type, date, parentFolderId).send({ from: accounts[0] });
+			await contract.methods.addFile(ipfsuniqueId, fileName, fileType, date, parentFolderId).send({ from: accounts[0] });
 		} catch (error) {
 			console.log(error);
 		}

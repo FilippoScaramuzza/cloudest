@@ -40,7 +40,7 @@ class RenameFilePopup extends Component {
   render() {
     const { open, loading } = this.state;
     return (
-      <Popup open={open} onClose={() => this.setState({open: undefined})} trigger={<div className="item">
+      <Popup open={open} onClose={() => this.setState({open: undefined, loading: false})} trigger={<div className="item">
         <i className="i cursor icon"></i>
         Rename
         </div>} modal>
