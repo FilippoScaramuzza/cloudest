@@ -53,7 +53,7 @@ class FileViewer extends Component {
 			this.render();
 		}
 		if (this.props.searchValue !== prevProps.searchValue) {
-			this.setState({ searchValue: this.props.searchValue });
+			this.setState({ searchValue: this.props.searchValue.toUpperCase() });
 			this.render();
 		}
 	}
@@ -430,7 +430,7 @@ class FileViewer extends Component {
 					filesDetailsFiltered = [];
 				}
 				else {
-					filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.name.includes(searchValue) && fd.fileType !== "folder" && !fd.isTrash);
+					filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.name.toUpperCase().includes(searchValue) && fd.fileType !== "folder" && !fd.isTrash);
 				}
 				break;
 			default:
@@ -481,15 +481,15 @@ class FileViewer extends Component {
 						if(fileType)
 							return (
 							<div className="item" key={index} onClick={() => this.setState({currentFileFilter: f})}>
-								<i className={fileType.icon}></i>
-									{fileType.text}
+								<span><i className={fileType.icon} style={{fontSize: "20px"}}></i>
+								{fileType.text}</span>
 							</div>
 							);
 						else return "";
 					})}
 					<Dropdown.Divider />
 					<div className="item" onClick={() => this.setState({currentFileFilter: ""})}>
-						<i className="file outline icon"></i>
+						<i className="file outline icon" style={{fontSize: "20px"}}></i>
 							All Files
 					</div>
 				</Dropdown.Menu>
