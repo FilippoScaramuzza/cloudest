@@ -135,9 +135,9 @@ class App extends Component {
           </button>
 
           <br /><br />
-          <div class="ui icon input" style={{ width: "70%" }} onClick={() => this.changeCurrentPage("search")}>
+          <div className="ui icon input" style={{ width: "70%" }} onClick={() => this.changeCurrentPage("search")}>
             <input type="text" placeholder="Search..." onChange={this.searchValueOnChangeHandler} />
-            <i class="teal inverted circular search link icon" ></i>
+            <i className="teal inverted circular search link icon" ></i>
           </div>
 
           <br /><br /><br /><br />

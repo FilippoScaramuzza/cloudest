@@ -34,7 +34,8 @@ class FileViewer extends Component {
 			parentFolderId: "/"
 		}],
 		filterFiles: [],
-		currentFileFilter: ""
+		currentFileFilter: "",
+		recentFileFilter: ""
 	}
 
 	componentDidMount = async () => {
@@ -87,7 +88,7 @@ class FileViewer extends Component {
 
 				console.log(res);
 
-				this.setState({ filesDetails: res , filterFiles});
+				this.setState({ filesDetails: res, filterFiles });
 			});
 		});
 	}
@@ -397,14 +398,14 @@ class FileViewer extends Component {
 	}
 
 	renderFilesDetails = () => {
-		const { filesDetails, currentPage, currentFolder, currentFolderTrash, searchValue, currentFileFilter } = this.state;
+		const { filesDetails, currentPage, currentFolder, currentFolderTrash, searchValue, currentFileFilter, recentFileFilter } = this.state;
 		if (filesDetails == null) return null;
 		let filesDetailsFiltered = null;
 
-		if(currentFileFilter !== "") {
+		if (currentFileFilter !== "") {
 			filesDetailsFiltered = filesDetails.filter(fd => fd.fileType === currentFileFilter || fd.fileType === "folder");
 		}
-		else{
+		else {
 			filesDetailsFiltered = filesDetails;
 		}
 
@@ -414,13 +415,29 @@ class FileViewer extends Component {
 				break;
 			case "recent":
 
-				let date = new Date();
-				let dd = String(date.getDate()).padStart(2, '0');
-				let mm = String(date.getMonth() + 1).padStart(2, '0');
-				let yyyy = date.getFullYear();
-				date = mm + '/' + dd + '/' + yyyy;
+				const ONE_HOUR = 60 * 60 * 1000;
+				const ONE_DAY = 24 * ONE_HOUR;
+				const ONE_WEEK = 7 * ONE_DAY;
+				const ONE_MONTH = 30 * ONE_DAY;
 
-				filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.transactionDate === date && fd.fileType !== "folder" && !fd.isTrash);
+				filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.fileType !== "folder" && !fd.isTrash);
+				switch (recentFileFilter) {
+					case ("hour"):
+						filesDetailsFiltered = filesDetailsFiltered.filter(fd => (((new Date()) - (new Date(fd.transactionDate))) < ONE_HOUR));
+						break;
+					case ("day"):
+						filesDetailsFiltered = filesDetailsFiltered.filter(fd => (((new Date()) - (new Date(fd.transactionDate))) < ONE_DAY));
+						break;
+					case ("week"):
+						filesDetailsFiltered = filesDetailsFiltered.filter(fd => (((new Date()) - (new Date(fd.transactionDate))) < ONE_WEEK));
+						break;
+					case ("month"):
+						filesDetailsFiltered = filesDetailsFiltered.filter(fd => (((new Date()) - (new Date(fd.transactionDate))) < ONE_MONTH));
+						break;
+					default:
+						break;
+				}
+
 				break;
 			case "trash":
 				filesDetailsFiltered = filesDetailsFiltered.filter(fd => fd.parentFolderId === currentFolderTrash.id && fd.isTrash);
@@ -478,18 +495,18 @@ class FileViewer extends Component {
 				<Dropdown.Menu>
 					{filterFiles.map((f, index) => {
 						let fileType = fileTypesList.find(ft => ft.fileExtension === f);
-						if(fileType)
+						if (fileType)
 							return (
-							<div className="item" key={index} onClick={() => this.setState({currentFileFilter: f})}>
-								<span><i className={fileType.icon} style={{fontSize: "15px"}}></i>
-								{fileType.text}</span>
-							</div>
+								<div className="item" key={index} onClick={() => this.setState({ currentFileFilter: f })}>
+									<span><i className={fileType.icon} style={{ fontSize: "15px" }}></i>
+										{fileType.text}</span>
+								</div>
 							);
 						else return "";
 					})}
 					<Dropdown.Divider />
-					<div className="item" onClick={() => this.setState({currentFileFilter: ""})}>
-						<i className="file outline icon" style={{fontSize: "15px"}}></i>
+					<div className="item" onClick={() => this.setState({ currentFileFilter: "" })}>
+						<i className="file outline icon" style={{ fontSize: "15px" }}></i>
 							All Files
 					</div>
 				</Dropdown.Menu>
@@ -528,7 +545,6 @@ class FileViewer extends Component {
 				filesDetails.sort(function (a, b) {
 					let dateA = new Date(a.transactionDate);
 					let dateB = new Date(b.transactionDate);
-					console.log(dateA + dateB);
 					if (dateA > dateB) { return -1; }
 					if (dateA < dateB) { return 1; }
 					return 0;
@@ -546,11 +562,11 @@ class FileViewer extends Component {
 			<Dropdown text='Order Files ' icon='sort' style={{ marginLeft: "30px" }}>
 				<Dropdown.Menu>
 					<div className="item" onClick={() => { this.orderBy("AZdown") }}>
-						<i class="sort alphabet down icon"></i>
+						<i className="sort alphabet down icon"></i>
 							A to Z
 						</div>
 					<div className="item" onClick={() => { this.orderBy("AZup") }} >
-						<i class="sort alphabet up icon"></i>
+						<i className="sort alphabet up icon"></i>
 							Z to A
 						</div>
 					<div className="item" onClick={() => { this.orderBy("Datedown") }} >
@@ -566,6 +582,36 @@ class FileViewer extends Component {
 		);
 	}
 
+	renderFiltersRecentPage = () => {
+		return (
+			<Dropdown text='Filter Files Uploaded' icon='filter'>
+				<Dropdown.Menu>
+					<div className="item" onClick={() => { this.setState({ recentFileFilter: "hour" }) }}>
+						<i className="hourglass outline icon"></i>
+							1 Hour ago
+						</div>
+					<div className="item" onClick={() => { this.setState({ recentFileFilter: "day" }) }} >
+						<i className="clock outline icon"></i>
+							1 Day ago
+						</div>
+					<div className="item" onClick={() => { this.setState({ recentFileFilter: "week" }) }}>
+						<i className="calendar alternate outline icon"></i>
+							1 Week ago
+						</div>
+					<div className="item" onClick={() => { this.setState({ recentFileFilter: "month" }) }}>
+						<i className="calendar outline icon"></i>
+							1 Month ago
+						</div>
+					<Dropdown.Divider />
+					<div className="item" onClick={() => { this.setState({ recentFileFilter: "" }) }} >
+						<i className="file outline icon"></i>
+							All Files
+						</div>
+				</Dropdown.Menu>
+			</Dropdown>
+		);
+	}
+
 	render() {
 		const { currentFolder, currentFolderTrash, currentPage } = this.state;
 		if ((currentFolder.id === "/" || currentPage === "trash") && (currentFolderTrash.id === "/" || currentPage === "files")) return (
@@ -575,7 +621,7 @@ class FileViewer extends Component {
 				</span>
 				<br /><br />
 				<div style={{ textAlign: "left" }}>
-					{this.renderFilters()} {this.renderOrderBy()}<br />
+					{currentPage !== "recent" ? this.renderFilters() : this.renderFiltersRecentPage()} {this.renderOrderBy()}<br />
 				</div>
 				<br /><br />
 				<div className="ui eight doubling cards">
