@@ -76,10 +76,10 @@ class AddFilePopup extends Component {
   }
 
   renderPath = () => {
-		const { path } = this.state;
+		const { path, currentFolder } = this.state;
 		return path.map((folder, index) => {
 			return (<><div class="ui icon label" key={index} style={{marginBottom: "5px"}}>
-				<i className="folder icon" />
+				<i className={currentFolder.id === folder.id ? "folder open icon" : "folder icon"} />
 				{folder.name}
 		  	</div>{index!==path.length-1 ? ">" : ""}</>);
 		});

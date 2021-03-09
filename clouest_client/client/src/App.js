@@ -91,11 +91,11 @@ class App extends Component {
         <div className="App">
           <div className="ui info message" style={{ margin: "40px auto" }}>
             <div className="header" style={{ textAlign: "center" }}>
-              Connecting to the Cloudest Chain...<br />
-              If it is taking too long you can:
+              Connecting to the Blockchain via Metamask...<br />
+              If you get an error:
           </div>
             <ul className="list">
-              <li>Check if you have installed MetaMask with the connection to the Cloudest Chain</li>
+              <li>Check if you have installed MetaMask (if not you can download it at <a href="https://metamask.io" target="_blank">metamask.io</a>)</li>
               <li>Reload the page</li>
             </ul>
           </div>

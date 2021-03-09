@@ -466,11 +466,11 @@ class FileViewer extends Component {
 	}
 
 	renderPath = () => {
-		const { currentPage, path, pathTrash } = this.state;
+		const { currentPage, path, pathTrash, currentFolder } = this.state;
 		if (currentPage === "files") {
 			return path.map((folder, index) => {
 				return (<><div className="ui icon label" key={index} style={{ cursor: "pointer" }} onClick={() => this.changeCurrentFolder(folder.id, folder.name, folder.parentFolderId)}>
-					<i className="folder icon" />
+					<i className={currentFolder.id === folder.id ? "folder open icon" : "folder icon"} />
 					{folder.name}
 				</div>{index !== path.length - 1 ? ">" : ""}</>);
 			});

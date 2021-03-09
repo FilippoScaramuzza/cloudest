@@ -69,6 +69,36 @@
             "fileExtension": "text/html",
             "icon": "html5 icon",
             "text": "HTML"
+        },
+        {
+            "fileExtension": "application/x-tex",
+            "icon": "code icon",
+            "text": "LaTeX"
+        },
+        {
+            "fileExtension": "application/zip",
+            "icon": "file archive outline icon",
+            "text": "Archive"
+        },
+        {
+            "fileExtension": "audio/mpeg",
+            "icon": "file audio outline icon",
+            "text": "Audio"
+        },
+        {
+            "fileExtension": "audio/x-m4a",
+            "icon": "file audio outline icon",
+            "text": "Audio"
+        },
+        {
+            "fileExtension": "video/mp4",
+            "icon": "file video outline icon",
+            "text": "Video"
+        },
+        {
+            "fileExtension": "video/avi",
+            "icon": "file video outline icon",
+            "text": "Video"
         }
     ] 
 }
