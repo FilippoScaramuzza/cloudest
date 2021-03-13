@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-
-//import FileDetailsManager from "./contracts/FileDetailsManager.json";
 import getWeb3 from "./getWeb3";
 import AddFilePopup from "./AddFilePopup";
 import AddFolderPopup from "./AddFolderPopup";
@@ -18,7 +16,11 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    currentFolder: { id: "/", name: "root", parentFolderId: "/" },
+    currentFolder: {
+      id: "/",
+      name: "root",
+      parentFolderId: "/"
+    },
     path: [{
       id: "/",
       name: "root",
@@ -148,15 +150,15 @@ class App extends Component {
             Trash Bin
           </button>
 
-          </div>
-
-          <div className="mainpage">
-            <h1 className="ui horizontal divider header">
-              {this.renderPageTitle()}
-            </h1>
-            <FileViewer web3={web3} currentPage={currentPage} searchValue={searchValue} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
-          </div>
         </div>
+
+        <div className="mainpage">
+          <h1 className="ui horizontal divider header">
+            {this.renderPageTitle()}
+          </h1>
+          <FileViewer web3={web3} currentPage={currentPage} searchValue={searchValue} updateCurrentFolder={this.updateCurrentFolder} ref={this.state.fileViewer} />
+        </div>
+      </div>
 
     );
   }

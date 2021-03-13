@@ -15,7 +15,7 @@ class AddFolderPopup extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-		if (this.props.currentFolder !== prevProps.currentFolder) // Check if it's a new user
+		if (this.props.currentFolder !== prevProps.currentFolder)
 		{
 			this.setState({ currentFolder: this.props.currentFolder });
 			this.render();

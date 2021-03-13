@@ -2,7 +2,7 @@ pragma solidity >=0.4.21 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 /*
- * Contract for storing and retrieve file details uploaded to the IPFS
+ * Contract for storing and retrieving file details uploaded to the IPFS
  * P2P network. This is made thanks to a "mapping" data structure, which allows
  * storing all file's information. More information through the source
  * code below.
@@ -60,6 +60,9 @@ contract FileDetailsManager {
         folderId++;
     }
 
+    /*
+     * When calling this function, the specified file is removed from the array
+     */
     function deleteFile(string memory uniqueId, string memory name) public {
         FileDetails[] storage filesDetails = filesList[msg.sender];
         uint index = 0;
@@ -76,6 +79,10 @@ contract FileDetailsManager {
         filesDetails.pop();
     }
 
+    /*
+     * When calling this funtion, the specified folder is removed from the list.
+     * In a recursive way also subfolder and inner files are deleted.
+     */
     function deleteFolder(string memory uniqueId) public {
         FileDetails[] storage filesDetails = filesList[msg.sender];
         uint index = 0;
@@ -104,9 +111,9 @@ contract FileDetailsManager {
     }
 
     /* 
-     * TODO: description of returned values
+     * When calling this function the array of file owned by the calling wallet 
+     * is returned.
     */
-    
     function getFiles() public view returns (FileDetails[] memory) {
         FileDetails[] memory fileToBeRetrieved = filesList[msg.sender];
         return (fileToBeRetrieved);
@@ -124,7 +131,7 @@ contract FileDetailsManager {
 
 
     /*
-     *
+     * When calling this function the field isFavorite of the specified file gets updated.
     */
     function setFavorite(string memory uniqueId, string memory name, bool  isFavorite) public{
         FileDetails[] storage filesDetails = filesList[msg.sender];
@@ -133,6 +140,9 @@ contract FileDetailsManager {
         }
     }
 
+    /*
+     * This function act as converter from uint to string.
+    */
     function uint2str(uint i) internal pure returns (string memory uintAsString) {
         if (i == 0) {
             return "0";
@@ -152,9 +162,11 @@ contract FileDetailsManager {
         return string(bstr);
     }
 
+    /*
+     * When calling this function the field isTrash of the specified file gets updated.
+     */
     function setTrashFile(string memory uniqueId, string memory name, bool isTrash, bool isSingleDelete) public {
         FileDetails[] storage filesDetails = filesList[msg.sender];
-        uint index = 0;
         for(uint i = 0; i < filesDetails.length; i++){
             if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId)) 
             && keccak256(bytes(filesDetails[i].name)) == keccak256(bytes(name))) {
@@ -165,10 +177,12 @@ contract FileDetailsManager {
             }
         }
     }
-
+    /*
+     * When calling this function the field isTrash of the specified folder gets updated.
+     * In a recursive way also subfolders and inner files get updated.
+     */
     function setTrashFolder(string memory uniqueId, bool isTrash, bool isSingleDelete) public {
         FileDetails[] storage filesDetails = filesList[msg.sender];
-        uint index = 0;
         for(uint i = 0; i < filesDetails.length; i++){
 
             if(keccak256(bytes(filesDetails[i].uniqueId)) == keccak256(bytes(uniqueId))){

@@ -47,7 +47,6 @@ class ContractsManager extends Component{
 		let ss = String(date.getSeconds());
 
 		date = MM + '/' + dd + '/' + yyyy + " " + hh + ":" + mm + ":" + ss;
-		console.log(date);
 		const filesDetails = await this.getFilesDetails();
 
 		let fileName = file.name;
