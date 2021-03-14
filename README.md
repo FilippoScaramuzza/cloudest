@@ -221,7 +221,7 @@ The details of each individual file are saved in a particular data structure (a 
 
 As you can see, each "file" is associated with its hash relating to IPFS, while each folder (which is assumed to have the same names) is associated with a unique address. This is calculated using a counter which is incremented each time a folder is created.
 
-### Mapping wallet $\rightarrow$ fileDetails
+### Mapping wallet -> fileDetails
 
 As mentioned above, each user, or rather each *wallet* that interacts with the contract by adding files, is assigned an array containing all the details of all the files added. To do this we used a data structure called `mapping`, as follows:
 
