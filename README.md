@@ -1,4 +1,7 @@
-# Cloudest, *The Cloud We Deserve* #
+<div style="text-align: center"># Cloudest, *The Cloud We Deserve* #</div>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://cloudest.cloud)
 
 Introduction
 ============
