@@ -4,8 +4,9 @@ Introduction
 ============
 
 ## Table of Contents ##
-- [Cloudest, *The Cloud We Deserve*](#cloudest-the-cloud-we-deserve)
 - [Introduction](#introduction)
+  - [The Problem](#the-problem)
+  - [The Possible Solution](#the-possible-solution)
 - [The System Architecture](#the-system-architecture)
   - [Structure and General Schema](#structure-and-general-schema)
   - [Framework: Truffle Suite](#framework-truffle-suite)
