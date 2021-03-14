@@ -8,33 +8,37 @@
 Introduction
 ============
 
-## Table of Contents ##
-- [Introduction](#introduction)
-  - [The Problem](#the-problem)
-  - [The Possible Solution](#the-possible-solution)
-- [The System Architecture](#the-system-architecture)
-  - [Structure and General Schema](#structure-and-general-schema)
-  - [Framework: Truffle Suite](#framework-truffle-suite)
-  - [Core Contract Code: Solidity](#core-contract-code-solidity)
-  - [Web Interfacing: Web3JS](#web-interfacing-web3js)
-  - [Front-End e Browser Tools](#front-end-e-browser-tools)
-  - [Blockchain](#blockchain)
-  - [HTTP Gateway: Infura](#http-gateway-infura)
-  - [P2P Storage: IPFS](#p2p-storage-ipfs)
-- [The Cloudest Development](#the-cloudest-development)
-  - [Organization and Time Management](#organization-and-time-management)
-  - [Time/Tasks Management and Development](#timetasks-management-and-development)
-- [The operation and use of Cloudest](#the-operation-and-use-of-cloudest)
-  - [Start and “login”](#start-and-login)
-  - [file/folder uploads](#filefolder-uploads)
-  - [Download, Rename File and Add To Favorites](#download-rename-file-and-add-to-favorites)
-  - [Move to Trash and Delete Definitively](#move-to-trash-and-delete-definitively)
-  - [Favorite Files, Recent Files, Search and Filters](#favorite-files-recent-files-search-and-filters)
-- [FileDetailsManager.sol Smart Contract](#filedetailsmanagersol-smart-contract)
-  - [Data Structures](#data-structures)
-  - [Smart Contract Methods](#smart-contract-methods)
-- [Firebase](#firebase)
-  - [References](#references)
+<details>
+  <summary>Table of Contents</summary>
+  
+  - [Introduction](#introduction)
+    - [The Problem](#the-problem)
+    - [The Possible Solution](#the-possible-solution)
+  - [The System Architecture](#the-system-architecture)
+    - [Structure and General Schema](#structure-and-general-schema)
+    - [Framework: Truffle Suite](#framework-truffle-suite)
+    - [Core Contract Code: Solidity](#core-contract-code-solidity)
+    - [Web Interfacing: Web3JS](#web-interfacing-web3js)
+    - [Front-End e Browser Tools](#front-end-e-browser-tools)
+    - [Blockchain](#blockchain)
+    - [HTTP Gateway: Infura](#http-gateway-infura)
+    - [P2P Storage: IPFS](#p2p-storage-ipfs)
+  - [The Cloudest Development](#the-cloudest-development)
+    - [Organization and Time Management](#organization-and-time-management)
+    - [Time/Tasks Management and Development](#timetasks-management-and-development)
+  - [The operation and use of Cloudest](#the-operation-and-use-of-cloudest)
+    - [Start and “login”](#start-and-login)
+    - [file/folder uploads](#filefolder-uploads)
+    - [Download, Rename File and Add To Favorites](#download-rename-file-and-add-to-favorites)
+    - [Move to Trash and Delete Definitively](#move-to-trash-and-delete-definitively)
+    - [Favorite Files, Recent Files, Search and Filters](#favorite-files-recent-files-search-and-filters)
+  - [FileDetailsManager.sol Smart Contract](#filedetailsmanagersol-smart-contract)
+    - [Data Structures](#data-structures)
+    - [Smart Contract Methods](#smart-contract-methods)
+  - [Firebase](#firebase)
+    - [References](#references)
+
+</details>
 
 The Problem
 -----------
