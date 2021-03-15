@@ -77,7 +77,7 @@ Core Contract Code: Solidity
 Web Interfacing: Web3JS
 -----------------------
 
-*Web3JS* is a library written entirely in Javascript which allows interaction, using appropriate tools, such as Metamask (see below), with the blockchain, in the case of Cloudest via HTTP. In fact once the `truffle 'command is executed compile` (specific command for compiling contracts of the suite of Truffle), a contract `json` file is created which Web3JS interprets, recalling for example specific functions of the contract from Javascript code.
+*Web3JS* is a library written entirely in Javascript which allows interaction, using appropriate tools, such as Metamask (see below), with the blockchain, in the case of Cloudest via HTTP. In fact once the command `truffle compile` is executed (specific command for compiling contracts of the suite of Truffle), a contract `json` file is created which Web3JS interprets, recalling for example specific functions of the contract from Javascript code.
 
 Front-End e Browser Tools
 -------------------------
