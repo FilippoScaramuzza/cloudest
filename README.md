@@ -200,7 +200,7 @@ Download, Rename File and Add To Favorites
 
 By pressing in "action", a link visible in each file and folder, the user has access to functions such as downloading the item, renaming it or adding favorites. In the figure you can see a screenshot of the download, rename and add to favorites functions.
 
-![image](documentation/images/renameFavorite.png) [fig:renameFavorite]
+![image](documentation/images/renameFavorite.png)
 
 ### Background
 
