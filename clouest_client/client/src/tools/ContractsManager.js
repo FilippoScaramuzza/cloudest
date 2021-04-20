@@ -88,6 +88,7 @@ class ContractsManager extends Component{
 
 	getFilesDetails = async () => {
 		const { accounts, contract } = this;
+		console.log(accounts, contract)
 		let filesDetails = null;
 		try {
 			filesDetails = await contract.methods.getFiles().call({ from: accounts[0] });

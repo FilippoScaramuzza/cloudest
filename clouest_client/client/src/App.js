@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import MetaTags from 'react-meta-tags';
 import getWeb3 from "./getWeb3";
 import AddFilePopup from "./AddFilePopup";
 import AddFolderPopup from "./AddFolderPopup";
@@ -91,6 +92,11 @@ class App extends Component {
     if (!web3) {
       return (
         <div className="App">
+          <MetaTags>
+            <title>Cloudest</title>
+            <meta id="meta-description" name="description" content="The Cloud We Deserve. A decentralized cloud storage based on IPFS and Ethereum." />
+            <meta id="og-title" property="og:title" content="Cloudest" />
+          </MetaTags>
           <div className="ui info message" style={{ margin: "40px auto" }}>
             <div className="header" style={{ textAlign: "center" }}>
               Connecting to the Blockchain via Metamask...<br />
