@@ -104,6 +104,7 @@ class App extends Component {
           </div>
             <ul className="list">
               <li>Check if you have installed MetaMask (if not you can download it at <a href="https://metamask.io" target="_blank">metamask.io</a>)</li>
+              <li>Set Kovan as your working network</li>
               <li>Reload the page</li>
             </ul>
           </div>
